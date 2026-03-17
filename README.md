@@ -1,4 +1,4 @@
-# MUSE Fashion AI v3 — Multi-Page Platform
+# MUSE Fashion v3 — Multi-Page Platform
 
 > A complete full-stack fashion intelligence platform. Five pages, light/dark mode, celebrity trends, curated shopping with Amazon & Flipkart links, and a pixel-level outfit analyser.
 
@@ -29,7 +29,6 @@ npm run dev
 open http://localhost:3000
 ```
 
-**No `.env` file needed. No API key. Nothing else required.**
 
 ---
 
