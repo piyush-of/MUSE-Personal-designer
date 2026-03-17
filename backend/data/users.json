@@ -1,0 +1,32 @@
+{
+  "users": [
+    {
+      "id": "3a7165ab-fa0f-41e1-8a03-35a1caccbb3e",
+      "name": "Muse User",
+      "email": "user1773768740413@example.com",
+      "passwordHash": "8349dc8b2b03a3e06bff633718bf0b70:27e83cd0200abc733f6a79a9d01c1bd6a503988fa8f84648c4e3d91da3b92db07bccc33e79aa12a0f7d999fbcd227ad84b38ab9795498636bb9f055fff70f451",
+      "role": "member",
+      "createdAt": "2026-03-17T17:32:20.551Z"
+    },
+    {
+      "id": "4227d36b-b902-4bb4-b92b-98443bb86ab4",
+      "name": "piyush",
+      "email": "piyush.kumawat0412@gmail.com",
+      "passwordHash": "0232661dd457ec019a54f4cfab4c6e60:478970509807bdcf3ae69c426877ee93d1d10c3a61916f56fe9839e0e3a5af9cdeabe39f3f76f01536c313dfcf22730d743cf69f98c1240b3a40ef2c12fc8d78",
+      "role": "member",
+      "createdAt": "2026-03-17T17:35:35.611Z"
+    }
+  ],
+  "sessions": [
+    {
+      "token": "932582952c3b69bcffdd4d7ced7ded72b2ea16014411620f71cc6be1d5c83d67",
+      "userId": "3a7165ab-fa0f-41e1-8a03-35a1caccbb3e",
+      "expiresAt": "2026-03-24T17:32:20.621Z"
+    },
+    {
+      "token": "5de3b4350359740eabeb8f8d7a185ba98ff57cd7e20716555b15bba53874d1df",
+      "userId": "4227d36b-b902-4bb4-b92b-98443bb86ab4",
+      "expiresAt": "2026-03-24T17:35:36.089Z"
+    }
+  ]
+}

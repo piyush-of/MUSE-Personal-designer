@@ -1,0 +1,34 @@
+'use strict';
+const path = require('path');
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const compression = require('compression');
+const rateLimit = require('express-rate-limit');
+const config = require('../config');
+const logger = require('./utils/logger');
+const errorHandler = require('./middleware/errorHandler');
+const { attachUser, requireAuth } = require('./middleware/auth');
+const { authRouter } = require('./routes/auth');
+const { analyzeRouter, trendsRouter, shoppingRouter, healthRouter } = require('./routes/index');
+
+const app = express();
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(cors({ origin: config.isDev ? '*' : false }));
+app.use(compression());
+app.use(morgan('dev', { stream: { write: m => logger.http(m.trim()) } }));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true }));
+app.use(attachUser);
+app.use('/api/', rateLimit({ windowMs: config.rateLimit.windowMs, max: config.rateLimit.max, standardHeaders: true, legacyHeaders: false }));
+app.use(express.static(path.join(__dirname, '../frontend/public'), { maxAge: config.isDev ? 0 : '1d' }));
+app.use('/health',           healthRouter);
+app.use('/api/auth',         authRouter);
+app.use('/api/analyze',      requireAuth, analyzeRouter);
+app.use('/api/trends',       requireAuth, trendsRouter);
+app.use('/api/shopping',     requireAuth, shoppingRouter);
+// SPA fallback
+app.get('*', (_req, res) => res.sendFile(path.join(__dirname, '../frontend/public/index.html')));
+app.use(errorHandler);
+module.exports = app;
