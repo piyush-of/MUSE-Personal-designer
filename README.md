@@ -1,4 +1,4 @@
-# MUSE Fashion v3 — Multi-Page Platform
+# MUSE Fashion v3 
 
 > A complete full-stack fashion intelligence platform. Five pages, light/dark mode, celebrity trends, curated shopping with Amazon & Flipkart links, and a pixel-level outfit analyser.
 
