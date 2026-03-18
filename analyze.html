@@ -6,7 +6,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="./css/style.css">
   <style>
     .analyze-hero { background:var(--bg-muted); padding:5rem 4rem 3rem; border-bottom:1px solid var(--border); }
     .analyzer-wrap { background:var(--bg-base); padding:4rem; }
@@ -48,7 +48,7 @@
   </style>
 </head>
 <body>
-  <script src="/js/nav.js"></script>
+  <script src="./js/nav.js"></script>
   <main class="page">
     <div class="analyze-hero">
       <span class="section-label">01 - Analysis Studio</span>
@@ -122,7 +122,7 @@
     </footer>
   </main>
 
-  <script src="/js/shared.js"></script>
+  <script src="./js/shared.js"></script>
   <script>
   'use strict';
 
@@ -190,7 +190,7 @@
       form.append('skinTone',S.skin);
       form.append('gender',S.gender);
       D.loadStep.textContent='Analysing colours and best combos...';
-      const res=await fetch('/api/analyze',{method:'POST',body:form});
+      const res=await fetch('./api/analyze',{method:'POST',body:form});
       const body=await res.json();
       if(!res.ok) throw new Error(body.error||(body.errors?.join(' '))||'Error');
       renderResults(body.data);

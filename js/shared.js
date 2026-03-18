@@ -3,10 +3,24 @@
  */
 'use strict';
 
-const PROTECTED_PATHS = new Set(['/analyze.html', '/shopping.html', '/trends.html', '/about.html', '/cart.html']);
-const PUBLIC_AUTH_PATHS = new Set(['/auth.html']);
+const PROTECTED_PATHS = new Set(['analyze.html', 'shopping.html', 'trends.html', 'about.html', 'cart.html']);
+const PUBLIC_AUTH_PATHS = new Set(['auth.html']);
 const CART_EVENT = 'muse-cart-updated';
 let activeUser = null;
+
+function getPageName(pathname = window.location.pathname) {
+  const normalized = String(pathname || '').replace(/\\/g, '/');
+  const trimmed = normalized.endsWith('/') ? normalized.slice(0, -1) : normalized;
+  return trimmed.split('/').pop() || 'index.html';
+}
+
+function pageHref(fileName) {
+  return `./${fileName}`;
+}
+
+function apiHref(path) {
+  return `./api/${String(path || '').replace(/^\/+/, '')}`;
+}
 
 function initTheme() {
   const saved = localStorage.getItem('muse-theme') || 'light';
@@ -24,13 +38,13 @@ function toggleTheme() {
 
 function updateToggleIcon(theme) {
   const btn = document.getElementById('themeToggle');
-  if (btn) btn.textContent = theme === 'dark' ? '☀' : '☾';
+  if (btn) btn.textContent = theme === 'dark' ? '\u2600' : '\u263E';
 }
 
 function setActiveNav() {
-  const path = window.location.pathname.replace(/\/$/, '') || '/';
+  const path = getPageName();
   document.querySelectorAll('.nav-links a').forEach(a => {
-    const href = a.getAttribute('href').replace(/\/$/, '') || '/';
+    const href = getPageName(a.getAttribute('href'));
     a.classList.toggle('active', href === path);
   });
 }
@@ -67,7 +81,7 @@ function initScrollLinks() {
 
 async function fetchCurrentUser() {
   try {
-    const res = await fetch('/api/auth/me', { credentials: 'same-origin' });
+    const res = await fetch(apiHref('auth/me'), { credentials: 'same-origin' });
     if (!res.ok) return null;
     const body = await res.json();
     return body.user || null;
@@ -78,12 +92,12 @@ async function fetchCurrentUser() {
 
 function redirectToAuth() {
   const next = encodeURIComponent(window.location.pathname + window.location.search);
-  window.location.href = `/auth.html?next=${next}`;
+  window.location.href = `${pageHref('auth.html')}?next=${next}`;
 }
 
 async function logout() {
   try {
-    await fetch('/api/auth/logout', {
+    await fetch(apiHref('auth/logout'), {
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
@@ -91,7 +105,7 @@ async function logout() {
   } finally {
     localStorage.removeItem('muse-user');
     showToast('Signed out successfully.', 'success');
-    window.location.href = '/auth.html';
+    window.location.href = pageHref('auth.html');
   }
 }
 
@@ -185,8 +199,8 @@ function renderAuthNav(user) {
             <strong>${user.name}</strong>
             <span>${user.email || 'MUSE member'}</span>
           </div>
-          <a href="/cart.html" class="profile-link">Cart / Wishlist <span class="profile-link__count">${count}</span></a>
-          <a href="/shopping.html" class="profile-link">Continue Shopping</a>
+          <a href="${pageHref('cart.html')}" class="profile-link">Cart / Wishlist <span class="profile-link__count">${count}</span></a>
+          <a href="${pageHref('shopping.html')}" class="profile-link">Continue Shopping</a>
           <button class="profile-link profile-link--button" id="logoutBtn" type="button">Logout</button>
         </div>
       </div>
@@ -210,7 +224,7 @@ function renderAuthNav(user) {
     return;
   }
 
-  host.innerHTML = `<a href="/auth.html" class="btn btn-outline btn-sm nav-auth-btn">Sign In</a>`;
+  host.innerHTML = `<a href="${pageHref('auth.html')}" class="btn btn-outline btn-sm nav-auth-btn">Sign In</a>`;
 }
 
 function refreshProfileCount() {
@@ -261,7 +275,7 @@ function runStartupAnimation() {
 }
 
 async function initAuth() {
-  const pathname = window.location.pathname;
+  const pathname = getPageName();
   const user = await fetchCurrentUser();
   activeUser = user;
   if (user) localStorage.setItem('muse-user', JSON.stringify(user));
@@ -274,7 +288,7 @@ async function initAuth() {
   }
 
   if (user && PUBLIC_AUTH_PATHS.has(pathname)) {
-    const next = new URLSearchParams(window.location.search).get('next') || '/';
+    const next = new URLSearchParams(window.location.search).get('next') || pageHref('index.html');
     window.location.href = next;
     return user;
   }
