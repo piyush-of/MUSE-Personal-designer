@@ -4,7 +4,6 @@
 'use strict';
 
 const CART_EVENT = 'muse-cart-updated';
-const PLACEHOLDER_API = 'https://jsonplaceholder.typicode.com';
 let activeUser = null;
 
 function getPageName(pathname = window.location.pathname) {
@@ -19,24 +18,6 @@ function pageHref(fileName) {
 
 function apiHref(path) {
   return `./api/${String(path || '').replace(/^\/+/, '')}`;
-}
-
-async function fetchJson(url, options = {}) {
-  const response = await fetch(url, options);
-  const contentType = response.headers.get('content-type') || '';
-  const text = await response.text();
-
-  if (!contentType.includes('application/json')) {
-    const err = new Error('Endpoint returned HTML instead of JSON.');
-    err.status = response.status;
-    err.body = text;
-    throw err;
-  }
-
-  return {
-    response,
-    data: text ? JSON.parse(text) : null,
-  };
 }
 
 function initTheme() {
@@ -97,19 +78,17 @@ function initScrollLinks() {
 }
 
 async function fetchCurrentUser() {
-  const localUser = JSON.parse(localStorage.getItem('muse-user') || 'null');
   try {
-    const { response, data } = await fetchJson(apiHref('auth/me'), { credentials: 'same-origin' });
-    if (!response.ok) return localUser;
-    return data?.user || localUser;
+    const res = await fetch(apiHref('auth/me'), { credentials: 'same-origin' });
+    if (!res.ok) return null;
+    const body = await res.json();
+    return body.user || null;
   } catch {
-    return localUser;
+    return null;
   }
 }
 
 async function logout() {
-  localStorage.removeItem('muse-user');
-  activeUser = null;
   try {
     await fetch(apiHref('auth/logout'), {
       method: 'POST',
@@ -117,6 +96,8 @@ async function logout() {
       headers: { 'Content-Type': 'application/json' },
     });
   } finally {
+    localStorage.removeItem('muse-user');
+    activeUser = null;
     showToast('Signed out successfully.', 'success');
     window.location.href = pageHref('index.html');
   }
@@ -321,11 +302,6 @@ window.MuseCart = {
   getAlerts: getCartAlerts,
   getCount: getCartCount,
   parsePriceFloor,
-};
-
-window.MuseApi = {
-  fetchJson,
-  placeholderBase: PLACEHOLDER_API,
 };
 
 window.addEventListener(CART_EVENT, refreshProfileCount);
