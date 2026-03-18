@@ -35,12 +35,15 @@
     .combo { margin-bottom:1.2rem; }
     .combo-label { font-family:var(--f-mono); font-size:0.57rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); margin-bottom:0.4rem; }
     .combo-vibe { font-size:0.78rem; color:rgba(240,235,227,0.45); margin-top:0.25rem; font-style:italic; }
-    .shop-item { border-top:1px solid var(--border); padding:0.8rem 0; }
+    .shop-item { border-top:1px solid var(--border); padding:1rem 0; }
     .shop-item:first-of-type { border-top:none; padding-top:0; }
+    .shop-item-grid { display:grid; grid-template-columns:104px 1fr; gap:0.9rem; align-items:start; }
     .shop-head { display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem; }
     .shop-why { font-size:0.82rem; color:var(--text-muted); line-height:1.5; margin-top:0.25rem; }
     .shop-tip { font-style:italic; font-size:0.78rem; color:var(--sage); margin-top:0.2rem; margin-bottom:0.5rem; }
     .shop-links { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem; }
+    .shop-sketch { border:1px solid var(--border); background:linear-gradient(180deg,#fbf7f2 0%,#f1e4d5 100%); padding:0.35rem; }
+    .shop-pattern { font-size:0.78rem; color:var(--text-secondary); line-height:1.55; margin-top:0.35rem; }
     @media(max-width:900px){ .analyzer-grid,.results-grid,.combo-dd-grid { grid-template-columns:1fr; } .analyzer-wrap,.analyze-hero { padding:3rem 1.5rem; } }
   </style>
 </head>
@@ -83,12 +86,16 @@
             </button>
           </div>
           <div class="skin-grid">
-            <label class="skin-opt" data-tone="fair"><input type="radio" name="skin" value="fair"><div class="skin-swatch" style="background:#F5DCCA"></div><span class="name">Fair</span><span class="sub">Light / Ivory</span></label>
+            <label class="skin-opt" data-tone="porcelain"><input type="radio" name="skin" value="porcelain"><div class="skin-swatch" style="background:#F7E5E3"></div><span class="name">Porcelain</span><span class="sub">Rose Ivory</span></label>
+            <label class="skin-opt" data-tone="fair"><input type="radio" name="skin" value="fair"><div class="skin-swatch" style="background:#F5DCCA"></div><span class="name">Fair</span><span class="sub">Light Ivory</span></label>
             <label class="skin-opt" data-tone="light"><input type="radio" name="skin" value="light"><div class="skin-swatch" style="background:#EAC49A"></div><span class="name">Light</span><span class="sub">Warm Beige</span></label>
+            <label class="skin-opt" data-tone="light_medium"><input type="radio" name="skin" value="light_medium"><div class="skin-swatch" style="background:#D7A173"></div><span class="name">Light-Med</span><span class="sub">Honey Beige</span></label>
             <label class="skin-opt" data-tone="medium"><input type="radio" name="skin" value="medium"><div class="skin-swatch" style="background:#C9955A"></div><span class="name">Medium</span><span class="sub">Golden Olive</span></label>
+            <label class="skin-opt" data-tone="olive"><input type="radio" name="skin" value="olive"><div class="skin-swatch" style="background:#A67B52"></div><span class="name">Olive</span><span class="sub">Neutral Gold</span></label>
             <label class="skin-opt" data-tone="tan"><input type="radio" name="skin" value="tan"><div class="skin-swatch" style="background:#A0633A"></div><span class="name">Tan</span><span class="sub">Caramel</span></label>
             <label class="skin-opt" data-tone="deep"><input type="radio" name="skin" value="deep"><div class="skin-swatch" style="background:#6B3A1F"></div><span class="name">Deep</span><span class="sub">Rich Brown</span></label>
-            <label class="skin-opt" data-tone="dark"><input type="radio" name="skin" value="dark"><div class="skin-swatch" style="background:#3B1F0E"></div><span class="name">Dark</span><span class="sub">Ebony</span></label>
+            <label class="skin-opt" data-tone="rich"><input type="radio" name="skin" value="rich"><div class="skin-swatch" style="background:#4A2716"></div><span class="name">Rich</span><span class="sub">Espresso</span></label>
+            <label class="skin-opt" data-tone="ebony"><input type="radio" name="skin" value="ebony"><div class="skin-swatch" style="background:#2C160C"></div><span class="name">Ebony</span><span class="sub">Deep Cool</span></label>
           </div>
           <button class="analyze-btn" id="analyzeBtn" disabled>Analyse My Style</button>
         </div>
@@ -119,12 +126,28 @@
   <script>
   'use strict';
 
-  const SKIN_INFO={fair:{name:'Fair / Ivory'},light:{name:'Light / Warm Beige'},medium:{name:'Medium / Golden Olive'},tan:{name:'Tan / Caramel'},deep:{name:'Deep / Rich Brown'},dark:{name:'Dark / Ebony'}};
+  const SKIN_INFO={porcelain:{name:'Porcelain / Rose Ivory'},fair:{name:'Fair / Ivory'},light:{name:'Light / Warm Beige'},light_medium:{name:'Light-Medium / Honey Beige'},medium:{name:'Medium / Golden Olive'},olive:{name:'Olive / Neutral Gold'},tan:{name:'Tan / Caramel'},deep:{name:'Deep / Rich Brown'},rich:{name:'Rich / Espresso Brown'},ebony:{name:'Ebony / Deep Cool Brown'}};
   const S={file:null,skin:null,gender:'women',busy:false};
+  let currentShopItems=[];
   const $=id=>document.getElementById(id);
   const D={fileInput:$('fileInput'),uploadZone:$('uploadZone'),previewWrap:$('previewWrap'),previewImg:$('previewImg'),previewName:$('previewName'),changeBtn:$('changeBtn'),skinOpts:document.querySelectorAll('.skin-opt'),genderBtns:document.querySelectorAll('.segment-btn'),analyzeBtn:$('analyzeBtn'),loadingBlock:$('loadingBlock'),loadStep:$('loadStep'),resultsSection:$('resultsSection'),resultsGrid:$('resultsGrid')};
   const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const chips=(arr,cls)=>(arr??[]).map(t=>`<span class="chip ${cls}">${esc(t)}</span>`).join('');
+
+  function sketchForCategory(category){
+    const kind=String(category||'').toLowerCase();
+    const shapes={
+      dress:'<path d="M40 18c2-6 9-10 16-10s14 4 16 10l4 11c1 4 5 8 9 10l9 6-12 12-5 31H35l-5-31-12-12 9-6c4-2 8-6 9-10l4-11Z" /><path d="M46 29h20" /><path d="M40 55h32" stroke="#B5674D" />',
+      'co-ord':'<path d="M40 18c2-6 9-10 16-10s14 4 16 10l4 11c1 4 5 8 9 10l9 6-12 12-5 31H35l-5-31-12-12 9-6c4-2 8-6 9-10l4-11Z" /><path d="M46 29h20" /><path d="M40 55h32" stroke="#B5674D" />',
+      tops:'<path d="M36 17c3-6 9-9 15-9h10c6 0 12 3 15 9l8 13-11 10-7 48H30l-7-48-11-10 8-13Z" /><path d="M40 31h32" stroke="#B5674D" />',
+      bottoms:'<path d="M33 12h46l6 24-8 52H57l-5-30-5 30H27l-8-52 14-24Z" /><path d="M33 12l11 25" /><path d="M79 12 68 37" />',
+      outerwear:'<path d="M35 13h48l9 15-13 12-8 48H47l-3-26-3 26H17L9 40-4 28l9-15Z" /><path d="M59 13v75" stroke="#B5674D" /><path d="M43 33h31" />',
+      footwear:'<path d="M13 61c8 0 14-6 20-15l6-9 10 2c5 2 9 5 14 9l12 12c3 3 7 4 11 4h7v10H13c-6 0-10-3-10-7s4-6 10-6Z" /><path d="M38 39c5 7 11 11 17 14" stroke="#B5674D" />',
+      accessories:'<path d="M24 31h64l-4 51c-1 7-6 11-13 11H41c-7 0-12-4-13-11l-4-51Z" /><path d="M40 31c0-13 8-22 16-22s16 9 16 22" /><path d="M37 50h38" stroke="#B5674D" />'
+    };
+    const markup=shapes[kind]||shapes.dress;
+    return `<svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g fill="none" stroke="#1A1714" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${markup}</g></svg>`;
+  }
 
   function handleFile(f){
     if(!f)return;
@@ -185,15 +208,22 @@
     const {outfit_analysis:oa,skin_palette:sp,shopping_picks:sh,combo_suggestions:cs,best_combo_matches:bc,style_dos_donts:dd}=data;
     const score=Math.max(0,Math.min(100,Number(oa.score??50)));
     const hexStrip=(sp.hex_palette??[]).slice(0,6).map(h=>`<div style="background:${esc(h)}"></div>`).join('');
-    const shopHTML=(sh.items??[]).map(it=>`
+    currentShopItems=sh.items??[];
+    const shopHTML=currentShopItems.map((it,index)=>`
       <div class="shop-item">
-        <div class="shop-head"><span style="font-family:var(--f-display);font-size:1rem">${esc(it.item)}</span><span class="chip">${esc(it.price_range)}</span></div>
-        ${it.category?`<span class="chip chip-sage" style="margin-top:.3rem;font-size:.5rem">${esc(it.category)}</span>`:''}
-        <p class="shop-why">${esc(it.why)}</p>
-        ${it.style_tip?`<p class="shop-tip">💡 ${esc(it.style_tip)}</p>`:''}
-        <div class="shop-links">
-          ${it.amazon?`<a href="${esc(it.amazon)}" target="_blank" rel="noopener" class="shop-link amazon">Amazon ↗</a>`:''}
-          ${it.flipkart?`<a href="${esc(it.flipkart)}" target="_blank" rel="noopener" class="shop-link flipkart">Flipkart ↗</a>`:''}
+        <div class="shop-item-grid">
+          <div class="shop-sketch">${sketchForCategory(it.category)}</div>
+          <div>
+            <div class="shop-head"><span style="font-family:var(--f-display);font-size:1rem">${esc(it.item)}</span><span class="chip">${esc(it.price_range)}</span></div>
+            ${it.category?`<span class="chip chip-sage" style="margin-top:.3rem;font-size:.5rem">${esc(it.category)}</span>`:''}
+            <p class="shop-why">${esc(it.why)}</p>
+            ${it.style_tip?`<p class="shop-tip">💡 ${esc(it.style_tip)}</p>`:''}
+            <p class="shop-pattern">Best pattern direction: keep this piece in a strong solid or a subtle print so the color story stays polished.</p>
+            <div class="shop-links">
+              ${(it.retailers??[]).map(retailer=>`<a href="${esc(retailer.url)}" target="_blank" rel="noopener" class="shop-link ${esc(retailer.name.toLowerCase().replace(/\s+/g,'-'))}">${esc(retailer.name)} ↗</a>`).join('')}
+              <button type="button" class="shop-link shop-action save-cart-btn" data-index="${index}">Save To Cart</button>
+            </div>
+          </div>
         </div>
       </div>`).join('');
     const comboHTML=(cs.combos??[]).map(c=>`<div class="combo"><div class="combo-label">${esc(c.name)} · ${esc(c.occasion)}</div><div class="chip-list">${(c.pieces??[]).map(p=>`<span class="chip chip-accent">${esc(p)}</span>`).join('')}</div><p class="combo-vibe">${esc(c.vibe)}</p></div>`).join('');
@@ -266,6 +296,18 @@
           </div>
         </div>
       </div>`;
+
+    D.resultsGrid.querySelectorAll('.save-cart-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const item=currentShopItems[Number(btn.dataset.index)];
+        if(!item||!window.MuseCart) return;
+        window.MuseCart.addItem({
+          ...item,
+          lineArtSvg: sketchForCategory(item.category),
+          story: oa.style_category,
+        });
+      });
+    });
   }
 
   D.fileInput.addEventListener('change',e=>handleFile(e.target.files[0]));

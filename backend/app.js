@@ -22,13 +22,30 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(attachUser);
 app.use('/api/', rateLimit({ windowMs: config.rateLimit.windowMs, max: config.rateLimit.max, standardHeaders: true, legacyHeaders: false }));
-app.use(express.static(path.join(__dirname, '../frontend/public'), { maxAge: config.isDev ? 0 : '1d' }));
+app.use('/css', express.static(path.join(__dirname, '../css'), { maxAge: config.isDev ? 0 : '1d' }));
+app.use('/js', express.static(path.join(__dirname, '../js'), { maxAge: config.isDev ? 0 : '1d' }));
 app.use('/health',           healthRouter);
 app.use('/api/auth',         authRouter);
 app.use('/api/analyze',      requireAuth, analyzeRouter);
 app.use('/api/trends',       requireAuth, trendsRouter);
 app.use('/api/shopping',     requireAuth, shoppingRouter);
-// SPA fallback
-app.get('*', (_req, res) => res.sendFile(path.join(__dirname, '../frontend/public/index.html')));
+
+const pageMap = new Map([
+  ['/', 'index.html'],
+  ['/index.html', 'index.html'],
+  ['/auth.html', 'auth.html'],
+  ['/analyze.html', 'analyze.html'],
+  ['/shopping.html', 'shopping.html'],
+  ['/cart.html', 'cart.html'],
+  ['/trends.html', 'trends.html'],
+  ['/about.html', 'about.html'],
+]);
+
+app.get('*', (req, res, next) => {
+  const page = pageMap.get(req.path);
+  if (!page) return next();
+  return res.sendFile(path.join(__dirname, '..', page));
+});
+
 app.use(errorHandler);
 module.exports = app;

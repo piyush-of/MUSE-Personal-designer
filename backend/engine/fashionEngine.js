@@ -16,6 +16,12 @@ const SKIN_DATA = {
   dark:   { name:'Dark / Ebony',          undertone:'Neutral-warm', seasonPalette:'Deep Winter / True Winter',   bestColors:['Pure White','Cobalt Blue','Canary Yellow','Hot Pink','Bright Turquoise','Electric Red','Lime Green','Gold'], avoidColors:['Dark Navy','Very Dark Colours','Muddy Browns'], hexPalette:['#FFFFFF','#0047AB','#FFE900','#FF69B4','#00CED1','#FF0000'], metals:'Gold, Rose Gold, Yellow Gold', neutrals:['Pure White','Bright Ivory','Camel','Gold'], tips:['High-contrast colours celebrate your complexion','Pure white is one of your most striking choices','Bright saturated hues look extraordinary on deep skin','Avoid very dark tones that reduce visual contrast'] }
 };
 
+SKIN_DATA.porcelain = { name:'Porcelain / Rose Ivory', undertone:'Cool-rosy', seasonPalette:'Light Summer / Soft Winter', bestColors:['Rose Pink','Powder Blue','Periwinkle','Soft White','Cool Taupe','Dusty Mauve','Sage Mist','Silver Grey'], avoidColors:['Harsh Orange','Mustard','Dark Olive'], hexPalette:['#F4DCDD','#D5E3F4','#C8C9F0','#F5F4EF','#C6BBB3','#B7C8BA'], metals:'Silver, White Gold, Platinum', neutrals:['Soft White','Cool Taupe','Dove Grey','Navy'], tips:['Soft cool colours keep your complexion bright and refined','Rosy pastels near the face look naturally polished','Silver jewellery sharpens your undertone beautifully','Avoid muddy warm shades that overpower delicate contrast'] };
+SKIN_DATA.light_medium = { name:'Light-Medium / Honey Beige', undertone:'Neutral-golden', seasonPalette:'Soft Autumn / Warm Spring', bestColors:['Apricot','Honey','Muted Teal','Warm Rose','Olive Beige','Soft Coral','Antique Gold','Cream'], avoidColors:['Icy Lilac','Blue Grey','Neon Lime'], hexPalette:['#E6B08C','#D6B05E','#6C9A8B','#D48C8C','#B9A47A','#F4E7D5'], metals:'Yellow Gold, Rose Gold, Bronze', neutrals:['Cream','Mushroom','Warm Taupe','Soft Olive'], tips:['Balanced warm neutrals are especially elegant on honey-beige skin','Muted teal and apricot create flattering contrast without harshness','Keep very cold greys away from the face','Antique gold accessories look effortless on you'] };
+SKIN_DATA.olive = { name:'Olive / Neutral Gold', undertone:'Olive-neutral', seasonPalette:'Deep Autumn / Soft Winter', bestColors:['Forest Green','Petrol Blue','Terracotta','Warm Ivory','Aubergine','Brick Red','Deep Teal','Moss'], avoidColors:['Ash Beige','Icy Mint','Pale Lavender'], hexPalette:['#3F5B3C','#2C5F77','#BA6C49','#F2E6D8','#5D3A5A','#7A8A4B'], metals:'Antique Gold, Bronze, Mixed Metals', neutrals:['Warm Ivory','Espresso','Olive Brown','Soft Black'], tips:['Depth and muted richness work beautifully with olive undertones','Petrol, forest, and aubergine give strong contrast without sharpness','Avoid overly ashy shades that flatten your skin','Mixed metals are often more harmonious than ultra-cool finishes'] };
+SKIN_DATA.rich = { name:'Rich / Espresso Brown', undertone:'Neutral-rich', seasonPalette:'Deep Winter / Jewel Autumn', bestColors:['Ruby','Peacock Blue','Marigold','Pure Ivory','Magenta','Emerald','Electric Blue','Amethyst'], avoidColors:['Dusty Brown','Muted Khaki','Smoke Olive'], hexPalette:['#8B1E3F','#006D77','#E3A008','#FFF8F0','#B32D7D','#0F8B5F'], metals:'Gold, Copper, Oxidised Gold', neutrals:['Pure Ivory','Espresso','Midnight Navy','Camel'], tips:['High-clarity jewel shades feel luxurious on rich espresso skin','Ivory often creates a cleaner contrast than beige','Keep muddy earth shades away from the face','Strong metallic warmth brings a premium finish to your palette'] };
+SKIN_DATA.ebony = { ...SKIN_DATA.dark, name:'Ebony / Deep Cool Brown', undertone:'Neutral-cool' };
+
 const COLOR_CATEGORIES = [
   { name:'White / Ivory',     test:(r,g,b)=>r>210&&g>210&&b>210 },
   { name:'Black / Charcoal',  test:(r,g,b)=>r<60&&g<60&&b<60 },
@@ -193,6 +199,28 @@ const DOS_DONTS={
   dark:{dos:['High-contrast looks are your signature','Pure white and brights make you radiate','Gold jewellery creates a regal glow','Canary yellow and turquoise are stunning'],donts:['Avoid head-to-toe very dark looks','Skip muddy brown tones','Avoid colours too close to your undertone']},
 };
 
+DOS_DONTS.porcelain = { dos:['Choose cool rose and blue-based pastels','Use silver jewellery to sharpen your palette','Keep contrast soft but defined','Lean on dove grey and soft white'], donts:['Avoid earthy mustard near the face','Skip murky olive tones','Avoid harsh warm rust shades'] };
+DOS_DONTS.light_medium = { dos:['Build around apricot, cream, and muted teal','Use antique gold hardware','Keep prints soft and tonal','Choose warm taupe instead of cold grey'], donts:['Avoid icy lilac close to your face','Skip neon accents','Avoid very blue greys in tops'] };
+DOS_DONTS.olive = { dos:['Wear petrol, forest, and aubergine confidently','Use mixed metals when styling','Anchor looks with warm ivory','Choose depth over brightness'], donts:['Avoid ashy beige near your face','Skip pastel mint','Avoid overly cool pale lavender'] };
+DOS_DONTS.rich = { dos:['Use jewel tones with clear contrast','Choose ivory instead of dusty beige','Let gold and copper accessories lead','Try strong saturated accents'], donts:['Avoid muddy khaki near your face','Skip washed-out olives','Avoid overly dusty browns'] };
+DOS_DONTS.ebony = { ...DOS_DONTS.dark, dos:['Build high-contrast looks with white and cobalt','Use bright turquoise and gold confidently','Keep prints crisp and intentional','Try clean ivory for daywear'], donts:['Avoid head-to-toe very dark looks','Skip muddy brown tones','Avoid flat low-contrast palettes'] };
+
+function buildRetailerLinks(item){
+  const query = encodeURIComponent(String(item.item || '').trim().replace(/\s+/g, ' '));
+  const links = [
+    { name: 'Amazon', url: item.amazon || `https://www.amazon.in/s?k=${query}` },
+    { name: 'Flipkart', url: item.flipkart || `https://www.flipkart.com/search?q=${query}` },
+    { name: 'Myntra', url: `https://www.myntra.com/${query}` },
+    { name: 'AJIO', url: `https://www.ajio.com/search/?text=${query}` },
+    { name: 'Nykaa Fashion', url: `https://www.nykaafashion.com/catalogsearch/result/?q=${query}` },
+    { name: 'Tata CLiQ', url: `https://www.tatacliq.com/search/?searchCategory=all&text=${query}` },
+  ];
+
+  return links.filter((link, index, arr) =>
+    link.url && arr.findIndex(other => other.url === link.url) === index
+  );
+}
+
 /* ── Helper functions ──────────────────────────────────────────────────── */
 function hasSimilarFamily(c){const f=c.map(getColorFamily);return new Set(f).size<=2;}
 function hasNeutral(c){return c.some(x=>['White / Ivory','Black / Charcoal','Grey','Beige / Cream','Camel / Tan','Navy Blue'].includes(x));}
@@ -209,9 +237,21 @@ function getColorFamily(c){
   return'other';
 }
 
+function resolveComboSkinTone(skinTone) {
+  const map = {
+    porcelain: 'fair',
+    light_medium: 'light',
+    olive: 'medium',
+    rich: 'deep',
+    ebony: 'dark',
+  };
+  return map[skinTone] || skinTone;
+}
+
 function buildBestComboMatches(skinTone, gender, detectedColors){
   const genderKey = gender === 'men' ? 'men' : 'women';
-  const combos = GENDER_COMBO_DB[genderKey][skinTone] || GENDER_COMBO_DB[genderKey].medium || [];
+  const resolvedSkin = resolveComboSkinTone(skinTone);
+  const combos = GENDER_COMBO_DB[genderKey][resolvedSkin] || GENDER_COMBO_DB[genderKey].medium || [];
   return combos
     .map(combo => ({
       ...combo,
@@ -321,11 +361,11 @@ async function analyse(buffer,skinTone,gender='women'){
   return{
     outfit_analysis:{description:`Your outfit features a ${styleObj.category.toLowerCase()} palette built around ${unique.slice(0,2).join(' and ').toLowerCase()} tones${unique.length>2?`, accented with ${unique.slice(2,4).join(' and ').toLowerCase()}`:''}. This creates a ${score>=75?'harmonious and well-balanced':'casual and relaxed'} overall look for ${audienceLabel}.`,style_category:styleObj.category,occasion:styleObj.occasions[0],season:hasEarthy(unique)?'Autumn / Winter':hasPastel(unique)?'Spring / Summer':'All Season',score,feedback:feedbacks[0]||skin.tips[0],strengths:strengths.slice(0,3),improvements:improvements.slice(0,2),detected_colors:unique},
     skin_palette:{summary:`With ${skin.undertone} undertones, you have the ${skin.seasonPalette} complexion type. ${skin.tips[0]}.`,best_colors:skin.bestColors,avoid_colors:skin.avoidColors,hex_palette:skin.hexPalette,season_palette:skin.seasonPalette,metals:skin.metals,neutrals:skin.neutrals},
-    shopping_picks:{intro:`Based on your ${styleObj.category.toLowerCase()} colour story and ${skin.name} skin tone, here are the pieces that will elevate your wardrobe:`,items:shoppingItems.map(i=>({item:i.item,category:i.category,why:i.why,price_range:i.priceRange,style_tip:i.styleTip,amazon:i.amazon,flipkart:i.flipkart}))},
+    shopping_picks:{intro:`Based on your ${styleObj.category.toLowerCase()} colour story and ${skin.name} skin tone, here are the pieces that will elevate your wardrobe:`,items:shoppingItems.map(i=>({item:i.item,category:i.category,why:i.why,price_range:i.priceRange,style_tip:i.styleTip,amazon:i.amazon,flipkart:i.flipkart,retailers:buildRetailerLinks(i)}))},
     combo_suggestions:{intro:`Three complete outfit formulas curated for your colouring and lifestyle:`,combos:combos.map(c=>({name:c.name,pieces:c.pieces,vibe:c.vibe,occasion:c.occasion}))},
     best_combo_matches:{intro:`Best ${audienceLabel} combos for your ${skin.name} skin tone:`,combos:bestMatches.map(c=>({name:c.name,pieces:c.pieces,vibe:c.vibe,occasion:c.occasion,colors:c.colors,why_match:c.whyMatch,match_score:c.matchScore}))},
     style_dos_donts:{dos:(DOS_DONTS[skinTone]||DOS_DONTS.medium).dos,donts:(DOS_DONTS[skinTone]||DOS_DONTS.medium).donts},
   };
 }
 
-module.exports={analyse,SKIN_DATA,SHOPPING_DB,COMBO_DB,GENDER_COMBO_DB};
+module.exports={analyse,SKIN_DATA,SHOPPING_DB,COMBO_DB,GENDER_COMBO_DB,buildRetailerLinks};

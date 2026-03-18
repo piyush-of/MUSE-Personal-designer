@@ -1,5 +1,5 @@
 'use strict';
-const VALID = new Set(['fair','light','medium','tan','deep','dark']);
+const VALID = new Set(['porcelain','fair','light','light_medium','medium','olive','tan','deep','rich','ebony']);
 const VALID_GENDERS = new Set(['women','men']);
 module.exports = (req,res,next) => {
   const errs=[];

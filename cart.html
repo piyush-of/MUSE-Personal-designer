@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart - MUSE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .cart-hero { padding: 5rem 4rem 3rem; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, var(--bg-muted), var(--bg-base)); }
+    .cart-hero p { max-width: 42rem; color: var(--text-secondary); margin-top: 0.9rem; }
+    .cart-shell { padding: 2.5rem 4rem 4rem; display: grid; grid-template-columns: 0.9fr 2.1fr; gap: 1.5rem; }
+    .cart-side, .cart-main-card, .cart-item { background: var(--bg-surface); border: 1px solid var(--border); }
+    .cart-side, .cart-main-card { padding: 1.4rem; }
+    .alert-list { display: grid; gap: 0.8rem; margin-top: 1rem; }
+    .alert-card { background: var(--bg-muted); border: 1px solid var(--border); padding: 0.9rem; }
+    .cart-list { display: grid; gap: 1rem; }
+    .cart-item { padding: 1.2rem; display: grid; grid-template-columns: 120px 1fr; gap: 1rem; }
+    .cart-item__art { border: 1px solid var(--border); background: linear-gradient(180deg, #fbf7f2 0%, #f1e4d5 100%); padding: 0.4rem; }
+    .cart-item__head { display: flex; justify-content: space-between; gap: 1rem; align-items: start; }
+    .cart-item__title { font-family: var(--f-display); font-size: 1.35rem; }
+    .cart-item__copy { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.7; margin-top: 0.4rem; }
+    .cart-form { display: flex; gap: 0.7rem; flex-wrap: wrap; margin-top: 0.9rem; }
+    .cart-form input { width: 180px; border: 1px solid var(--border); background: var(--bg-base); padding: 0.8rem 0.9rem; font: inherit; }
+    .cart-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.9rem; }
+    .cart-empty { text-align: center; color: var(--text-muted); padding: 3rem 1.2rem; border: 1px dashed var(--border); }
+    @media(max-width:900px) { .cart-shell { grid-template-columns: 1fr; padding: 2rem 1.5rem 4rem; } .cart-hero { padding: 4rem 1.5rem 2.5rem; } .cart-item { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <script src="/js/nav.js"></script>
+  <main class="page">
+    <section class="cart-hero">
+      <span class="section-label">05 - Cart / Wishlist</span>
+      <h1>Your saved <em>fashion picks</em></h1>
+      <p>Save products from analysis or shopping, set your target price, and MUSE will flag the items that already fall within your budget range.</p>
+    </section>
+
+    <section class="cart-shell">
+      <aside class="cart-side">
+        <span class="section-label">Price Alerts</span>
+        <h3>Budget watch</h3>
+        <p style="color:var(--text-secondary);font-size:.9rem;line-height:1.7;margin-top:.6rem">Set a target price for any saved product. When the current listed floor price is at or below your range, it appears here.</p>
+        <div class="alert-list" id="alertList"></div>
+      </aside>
+
+      <div class="cart-main-card">
+        <div style="display:flex;justify-content:space-between;gap:1rem;align-items:end;margin-bottom:1rem">
+          <div>
+            <span class="section-label">Saved Products</span>
+            <h2>Cart items</h2>
+          </div>
+          <p id="cartMeta" style="color:var(--text-muted);font-size:.85rem">0 saved items</p>
+        </div>
+        <div class="cart-list" id="cartList"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/js/shared.js"></script>
+  <script>
+  'use strict';
+
+  const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  function renderAlerts(items) {
+    const alerts = window.MuseCart ? window.MuseCart.getAlerts() : [];
+    const host = document.getElementById('alertList');
+    host.innerHTML = alerts.length ? alerts.map(item => `
+      <div class="alert-card">
+        <strong style="display:block;font-family:var(--f-display);font-size:1rem;font-weight:400">${esc(item.item)}</strong>
+        <span style="display:block;color:var(--text-muted);font-size:.82rem;margin-top:.25rem">Current floor ${esc(item.priceRange)} · Target Rs ${esc(item.targetPrice)}</span>
+      </div>
+    `).join('') : '<div class="cart-empty">No items are under your target price yet.</div>';
+  }
+
+  function renderCart() {
+    const items = window.MuseCart ? window.MuseCart.getItems() : [];
+    document.getElementById('cartMeta').textContent = `${items.length} saved item${items.length === 1 ? '' : 's'}`;
+    document.getElementById('cartList').innerHTML = items.length ? items.map(item => `
+      <article class="cart-item">
+        <div class="cart-item__art">${item.lineArtSvg || ''}</div>
+        <div>
+          <div class="cart-item__head">
+            <div>
+              <div class="chip-list">
+                ${item.category ? `<span class="chip chip-sage">${esc(item.category)}</span>` : ''}
+                ${item.story ? `<span class="chip">${esc(item.story)}</span>` : ''}
+                <span class="chip chip-rose">${esc(item.priceRange)}</span>
+              </div>
+              <div class="cart-item__title">${esc(item.item)}</div>
+            </div>
+          </div>
+          <p class="cart-item__copy">${esc(item.why)}</p>
+          ${item.styleTip ? `<p class="cart-item__copy"><strong style="color:var(--text-primary)">Style note:</strong> ${esc(item.styleTip)}</p>` : ''}
+          <div class="cart-form">
+            <input type="number" min="1" step="1" placeholder="Set target price in Rs" value="${item.targetPrice ?? ''}" data-target-id="${esc(item.id)}">
+            <button type="button" class="btn btn-outline btn-sm" data-save-target="${esc(item.id)}">Save Target</button>
+          </div>
+          <div class="cart-actions">
+            ${(item.retailers || []).map(retailer => `<a href="${esc(retailer.url)}" target="_blank" rel="noopener" class="shop-link ${esc(retailer.name.toLowerCase().replace(/\s+/g, '-'))}">${esc(retailer.name)} ↗</a>`).join('')}
+            <button type="button" class="shop-link shop-action" data-remove-id="${esc(item.id)}">Remove</button>
+          </div>
+        </div>
+      </article>
+    `).join('') : '<div class="cart-empty">Your cart is empty. Save products from Shopping or Analyse to build your wishlist.</div>';
+
+    renderAlerts(items);
+
+    document.querySelectorAll('[data-save-target]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-save-target');
+        const input = btn.closest('.cart-form')?.querySelector('input');
+        const value = input && input.value ? Number(input.value) : null;
+        if (window.MuseCart) {
+          window.MuseCart.updateTarget(id, value);
+          renderCart();
+          showToast('Target price saved.', 'success');
+        }
+      });
+    });
+
+    document.querySelectorAll('[data-remove-id]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-remove-id');
+        if (window.MuseCart) {
+          window.MuseCart.removeItem(id);
+          renderCart();
+          showToast('Item removed from cart.', 'success');
+        }
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', renderCart);
+  window.addEventListener('muse-cart-updated', renderCart);
+  </script>
+</body>
+</html>
