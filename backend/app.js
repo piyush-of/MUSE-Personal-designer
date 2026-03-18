@@ -9,7 +9,7 @@ const rateLimit = require('express-rate-limit');
 const config = require('../config');
 const logger = require('./utils/logger');
 const errorHandler = require('./middleware/errorHandler');
-const { attachUser, requireAuth } = require('./middleware/auth');
+const { attachUser } = require('./middleware/auth');
 const { authRouter } = require('./routes/auth');
 const { analyzeRouter, trendsRouter, shoppingRouter, healthRouter } = require('./routes/index');
 
@@ -26,9 +26,9 @@ app.use('/css', express.static(path.join(__dirname, '../css'), { maxAge: config.
 app.use('/js', express.static(path.join(__dirname, '../js'), { maxAge: config.isDev ? 0 : '1d' }));
 app.use('/health',           healthRouter);
 app.use('/api/auth',         authRouter);
-app.use('/api/analyze',      requireAuth, analyzeRouter);
-app.use('/api/trends',       requireAuth, trendsRouter);
-app.use('/api/shopping',     requireAuth, shoppingRouter);
+app.use('/api/analyze',      analyzeRouter);
+app.use('/api/trends',       trendsRouter);
+app.use('/api/shopping',     shoppingRouter);
 
 const pageMap = new Map([
   ['/', 'index.html'],

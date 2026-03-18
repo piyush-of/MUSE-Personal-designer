@@ -13,13 +13,13 @@
   <script src="./js/nav.js"></script>
   <main class="page auth-shell">
     <section class="auth-brand">
-      <span class="section-label">Private Access</span>
+      <span class="section-label">Optional Account</span>
       <h1>Enter the <em>MUSE</em> atelier.</h1>
-      <p>Create your account or sign in to unlock outfit analysis, trends, shopping intelligence, and your protected MUSE experience.</p>
+      <p>Create an account or sign in if you want saved cart access and a personalized profile. You can still use the main MUSE features without logging in.</p>
       <div class="chip-list" style="margin-top:1.6rem">
-        <span class="chip chip-gold">Protected Analysis</span>
+        <span class="chip chip-gold">Optional Sign In</span>
         <span class="chip chip-rose">Saved Session</span>
-        <span class="chip chip-sage">Private Access</span>
+        <span class="chip chip-sage">Access Anytime</span>
       </div>
     </section>
 
@@ -46,7 +46,7 @@
           <button class="btn btn-primary auth-submit" type="submit" id="submitBtn">Sign In To MUSE</button>
         </form>
 
-        <p class="auth-note" id="authNote">Use your account to access the full MUSE experience across analysis, trends, shopping, and recommendations.</p>
+        <p class="auth-note" id="authNote">Use an account if you want saved cart data and a personalized MUSE session. Browsing and core tools remain open to everyone.</p>
       </div>
     </section>
   </main>
@@ -69,8 +69,8 @@
     nameField.style.display = mode === 'register' ? 'block' : 'none';
     submitBtn.textContent = mode === 'register' ? 'Create My MUSE Account' : 'Sign In To MUSE';
     authNote.textContent = mode === 'register'
-      ? 'Create your private MUSE account to unlock protected fashion tools and personalised recommendations.'
-      : 'Sign in to continue into your protected MUSE workspace.';
+      ? 'Create your MUSE account to save your cart, keep a session, and personalize your experience.'
+      : 'Sign in if you want saved cart data and a personalized MUSE session.';
   }
 
   tabs.forEach(tab => {

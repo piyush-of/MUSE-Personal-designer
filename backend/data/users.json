@@ -15,6 +15,14 @@
       "passwordHash": "0232661dd457ec019a54f4cfab4c6e60:478970509807bdcf3ae69c426877ee93d1d10c3a61916f56fe9839e0e3a5af9cdeabe39f3f76f01536c313dfcf22730d743cf69f98c1240b3a40ef2c12fc8d78",
       "role": "member",
       "createdAt": "2026-03-17T17:35:35.611Z"
+    },
+    {
+      "id": "fd15c61b-488b-4904-82ab-f18c274baccf",
+      "name": "Codex User",
+      "email": "codex1773857935122@example.com",
+      "passwordHash": "91af0575ccbac1ac0228c3fd80eab6a6:b2b7d2cbf62ffc20be914ab3997f5a40c5aac210d5abcf7ac8990932f5d3ac7fa06fbfc7f99fd82ef77463ea030866a680f394125260c21330545c0c3cfb54a1",
+      "role": "member",
+      "createdAt": "2026-03-18T18:18:55.297Z"
     }
   ],
   "sessions": [
@@ -27,6 +35,11 @@
       "token": "8efe38286ac0ec01cfa9d95ec461dec9c90c42623dc1de336c3b00a8225fe231",
       "userId": "4227d36b-b902-4bb4-b92b-98443bb86ab4",
       "expiresAt": "2026-03-24T18:13:18.885Z"
+    },
+    {
+      "token": "ce37269609d62a6ef16d87362e1ae68e54a1b5933cc412afe3475e703113f9f0",
+      "userId": "fd15c61b-488b-4904-82ab-f18c274baccf",
+      "expiresAt": "2026-03-25T18:18:55.377Z"
     }
   ]
 }

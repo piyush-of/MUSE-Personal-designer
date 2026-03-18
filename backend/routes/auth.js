@@ -2,7 +2,6 @@
 
 const router = require('express').Router();
 const { registerUser, createSession, clearSession, SESSION_TTL_MS } = require('../utils/authStore');
-const { requireAuth } = require('../middleware/auth');
 
 function setSessionCookie(res, token) {
   const isProd = process.env.NODE_ENV === 'production';
@@ -63,8 +62,8 @@ router.post('/logout', async (req, res, next) => {
   }
 });
 
-router.get('/me', requireAuth, (req, res) => {
-  res.json({ success: true, user: req.user });
+router.get('/me', (req, res) => {
+  res.json({ success: true, user: req.user || null });
 });
 
 module.exports = { authRouter: router };

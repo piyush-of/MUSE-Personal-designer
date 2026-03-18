@@ -3,8 +3,6 @@
  */
 'use strict';
 
-const PROTECTED_PATHS = new Set(['analyze.html', 'shopping.html', 'trends.html', 'about.html', 'cart.html']);
-const PUBLIC_AUTH_PATHS = new Set(['auth.html']);
 const CART_EVENT = 'muse-cart-updated';
 let activeUser = null;
 
@@ -90,11 +88,6 @@ async function fetchCurrentUser() {
   }
 }
 
-function redirectToAuth() {
-  const next = encodeURIComponent(window.location.pathname + window.location.search);
-  window.location.href = `${pageHref('auth.html')}?next=${next}`;
-}
-
 async function logout() {
   try {
     await fetch(apiHref('auth/logout'), {
@@ -104,8 +97,9 @@ async function logout() {
     });
   } finally {
     localStorage.removeItem('muse-user');
+    activeUser = null;
     showToast('Signed out successfully.', 'success');
-    window.location.href = pageHref('auth.html');
+    window.location.href = pageHref('index.html');
   }
 }
 
@@ -275,23 +269,15 @@ function runStartupAnimation() {
 }
 
 async function initAuth() {
-  const pathname = getPageName();
   const user = await fetchCurrentUser();
   activeUser = user;
-  if (user) localStorage.setItem('muse-user', JSON.stringify(user));
+  if (user) {
+    localStorage.setItem('muse-user', JSON.stringify(user));
+  } else {
+    localStorage.removeItem('muse-user');
+  }
   renderAuthNav(user);
   refreshProfileCount();
-
-  if (!user && PROTECTED_PATHS.has(pathname)) {
-    redirectToAuth();
-    return null;
-  }
-
-  if (user && PUBLIC_AUTH_PATHS.has(pathname)) {
-    const next = new URLSearchParams(window.location.search).get('next') || pageHref('index.html');
-    window.location.href = next;
-    return user;
-  }
 
   showCartAlertToast();
   return user;
