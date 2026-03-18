@@ -12,21 +12,17 @@
     .shop-shell { background: linear-gradient(180deg, var(--bg-muted) 0%, var(--bg-base) 42%); }
     .shop-hero { padding: 5rem 4rem 3rem; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 2rem; align-items: end; }
     .shop-hero-copy p { color: var(--text-secondary); font-size: 1rem; margin-top: 0.9rem; max-width: 40rem; }
-    .shop-hero-copy .chip-list { margin-top: 1.2rem; }
     .shop-context { background: rgba(255,255,255,0.52); border: 1px solid var(--border); padding: 1.6rem; box-shadow: var(--shadow-sm); backdrop-filter: blur(12px); }
-    .shop-context h3 { margin-bottom: 0.7rem; }
     .context-copy { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.75; }
     .context-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; margin-top: 1rem; }
     .context-pill { background: var(--bg-surface); border: 1px solid var(--border); padding: 0.8rem; }
     .context-pill strong { display: block; font-family: var(--f-display); font-size: 1rem; font-weight: 400; }
     .context-pill span { display: block; font-family: var(--f-mono); font-size: 0.55rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-top: 0.35rem; }
-
     .shop-toolbar { padding: 1.4rem 4rem; border-bottom: 1px solid var(--border); background: rgba(249,245,239,0.85); position: sticky; top: 64px; z-index: 100; backdrop-filter: blur(14px); }
     .toolbar-grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 0.8rem; }
     .toolbar-field { display: grid; gap: 0.45rem; }
     .toolbar-field label { font-family: var(--f-mono); font-size: 0.56rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
     .toolbar-field select { width: 100%; border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-primary); padding: 0.9rem 1rem; font: inherit; }
-
     .shop-main { padding: 2.5rem 4rem 4rem; display: grid; grid-template-columns: 0.95fr 2.05fr; gap: 1.5rem; }
     .shop-side { display: grid; gap: 1.2rem; align-content: start; }
     .insight-card { background: var(--bg-surface); border: 1px solid var(--border); padding: 1.4rem; }
@@ -39,7 +35,6 @@
     .trend-pill { border: 1px solid var(--border); background: var(--bg-muted); padding: 0.9rem; }
     .trend-pill strong { display: block; font-size: 0.92rem; font-weight: 500; }
     .trend-pill span { display: block; color: var(--text-muted); font-size: 0.8rem; margin-top: 0.25rem; }
-
     .shop-results-head { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.2rem; }
     .shop-results-head p { color: var(--text-muted); font-size: 0.85rem; }
     .shop-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.2rem; }
@@ -47,7 +42,7 @@
     .shop-experience-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--rose); }
     .card-top { display: grid; grid-template-columns: 150px 1fr; gap: 1rem; align-items: start; }
     .line-art-box { border: 1px solid var(--border); background: linear-gradient(180deg, #fbf7f2 0%, #f1e4d5 100%); padding: 0.6rem; min-height: 168px; display: flex; align-items: center; justify-content: center; }
-    .line-art-box svg { width: 100%; height: auto; }
+    .line-art-box img { width: 100%; border-radius: 18px; }
     .item-name { font-family: var(--f-display); font-size: 1.45rem; line-height: 1.08; margin-top: 0.35rem; }
     .item-copy { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.7; }
     .meta-row { display: flex; flex-wrap: wrap; gap: 0.45rem; }
@@ -56,20 +51,8 @@
     .pattern-copy { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.65; }
     .links-row { display: flex; flex-wrap: wrap; gap: 0.55rem; }
     .empty-state { border: 1px dashed var(--border); padding: 3rem 1.5rem; text-align: center; color: var(--text-muted); background: var(--bg-surface); }
-
-    @media(max-width:1080px) {
-      .shop-hero, .shop-main { grid-template-columns: 1fr; }
-      .toolbar-grid { grid-template-columns: 1fr 1fr; }
-      .shop-grid { grid-template-columns: 1fr; }
-    }
-
-    @media(max-width:720px) {
-      .shop-hero, .shop-toolbar, .shop-main { padding-left: 1.5rem; padding-right: 1.5rem; }
-      .shop-hero { padding-top: 4rem; }
-      .toolbar-grid { grid-template-columns: 1fr; }
-      .card-top { grid-template-columns: 1fr; }
-      .context-grid { grid-template-columns: 1fr; }
-    }
+    @media(max-width:1080px) { .shop-hero, .shop-main { grid-template-columns: 1fr; } .toolbar-grid { grid-template-columns: 1fr 1fr; } .shop-grid { grid-template-columns: 1fr; } }
+    @media(max-width:720px) { .shop-hero, .shop-toolbar, .shop-main { padding-left: 1.5rem; padding-right: 1.5rem; } .shop-hero { padding-top: 4rem; } .toolbar-grid { grid-template-columns: 1fr; } .card-top, .context-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -78,19 +61,18 @@
     <section class="shop-hero">
       <div class="shop-hero-copy">
         <span class="section-label">02 - Interactive Shopping Studio</span>
-        <h1>Shop with an <em>AI styling layer</em></h1>
-        <p>Every shopping pick now comes with a generated line sketch, dress name, trend-backed context, and the best color-pattern direction for your skin tone and style category.</p>
-        <div class="chip-list">
-          <span class="chip chip-rose" id="updatedChip">Updated 2026-03-17</span>
-          <span class="chip">Amazon, Flipkart, Myntra, AJIO, Nykaa Fashion, Tata CLiQ</span>
-          <span class="chip">Color pattern guidance</span>
+        <h1>Shop with an <em>editorial data layer</em></h1>
+        <p>This static-friendly version uses JSONPlaceholder data to generate shopping cards, trend context, and save-to-cart suggestions without a custom backend.</p>
+        <div class="chip-list" style="margin-top:1.2rem">
+          <span class="chip chip-rose" id="updatedChip">Updated 2026-03-19</span>
+          <span class="chip">JSONPlaceholder mode</span>
+          <span class="chip">Static hosting friendly</span>
         </div>
       </div>
-
       <aside class="shop-context">
         <span class="section-label">Live Context</span>
         <h3 id="contextHeadline">Medium skin tone + Classic Neutrals</h3>
-        <p class="context-copy" id="contextCopy">Choose a category, audience, and skin tone to load stronger buying suggestions from the shopping and trend APIs together.</p>
+        <p class="context-copy" id="contextCopy">Choose filters to refresh this shopping experience.</p>
         <div class="context-grid" id="contextGrid"></div>
       </aside>
     </section>
@@ -166,11 +148,10 @@
             </div>
           </div>
         </article>
-
         <article class="insight-card">
           <span class="section-label">Trend Signals</span>
           <h3>Current fashion cues</h3>
-          <p>Shopping suggestions are blended with the latest trend feed so you can see what colors and categories are strongest right now.</p>
+          <p>Cards below are generated from JSONPlaceholder images, posts, and user metadata to keep the experience working on static hosts.</p>
           <div class="trend-list" id="trendList"></div>
         </article>
       </aside>
@@ -190,7 +171,7 @@
     <footer class="site-footer">
       <div class="footer-bottom" style="border-top:none;padding-top:0">
         <p>&copy; 2026 MUSE Studio</p>
-        <p>Interactive shopping suggestions with generated line sketches and palette guidance</p>
+        <p>Interactive shopping suggestions powered by JSONPlaceholder demo data</p>
       </div>
     </footer>
   </main>
@@ -199,49 +180,88 @@
   <script>
   'use strict';
 
-  const state = {
-    category: 'all',
-    gender: 'women',
-    skinTone: 'medium',
-    itemType: 'all',
+  const PLACEHOLDER = window.MuseApi?.placeholderBase || 'https://jsonplaceholder.typicode.com';
+  const ITEM_TYPES = ['Dress', 'Co-ord', 'Tops', 'Bottoms', 'Outerwear', 'Footwear', 'Accessories'];
+  const STYLE_CONFIG = {
+    neutral: { label: 'Classic Neutrals', bestColors: ['Ivory', 'Camel', 'Greige', 'Soft Black'], accents: ['Stone', 'Taupe'], avoid: ['Neon Lime', 'Harsh Purple'], metals: 'Gold', trends: ['Quiet tailoring', 'Soft contrast', 'Polished basics'] },
+    earthy: { label: 'Earth Tones', bestColors: ['Terracotta', 'Olive', 'Sand', 'Chocolate'], accents: ['Cream', 'Coffee'], avoid: ['Icy Blue', 'Cool Magenta'], metals: 'Bronze', trends: ['Textured linen', 'Warm layers', 'Resort utility'] },
+    bold: { label: 'Bold & Vivid', bestColors: ['Cobalt', 'Fuchsia', 'Emerald', 'Bright White'], accents: ['Ink', 'Silver'], avoid: ['Dusty Beige', 'Muted Taupe'], metals: 'Silver', trends: ['Color blocking', 'Graphic accents', 'Statement silhouettes'] },
+    pastel: { label: 'Pastels', bestColors: ['Powder Blue', 'Blush', 'Mint', 'Butter'], accents: ['Pearl', 'Soft Grey'], avoid: ['Heavy Black', 'Rust Red'], metals: 'Rose Gold', trends: ['Airy layers', 'Soft tonal sets', 'Romantic styling'] },
+    classic: { label: 'Timeless Classic', bestColors: ['Navy', 'White', 'Beige', 'Espresso'], accents: ['Camel', 'Slate'], avoid: ['Acid Green', 'Over-bright Orange'], metals: 'Gold', trends: ['Sharp shirting', 'Heritage checks', 'Tailored separates'] }
   };
+  const state = { category: 'all', gender: 'women', skinTone: 'medium', itemType: 'all' };
+  let currentItems = [];
 
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-  function renderTag(value) {
-    return `<span class="palette-tag"><span class="swatch-dot"></span>${esc(value)}</span>`;
-  }
+  const titleCase = value => String(value || '').split(/\s+/).filter(Boolean).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  const renderTag = value => `<span class="palette-tag"><span class="swatch-dot"></span>${esc(value)}</span>`;
 
   function renderTrend(trend) {
-    return `
-      <div class="trend-pill">
-        <strong>${esc(trend.trend)}</strong>
-        <span>${esc(trend.season)}</span>
-        <div class="chip-list" style="margin-top:.55rem">
-          ${(trend.colors || []).slice(0, 3).map(color => `<span class="chip">${esc(color)}</span>`).join('')}
-        </div>
-      </div>
-    `;
+    return `<div class="trend-pill"><strong>${esc(trend.trend)}</strong><span>${esc(trend.season)}</span><div class="chip-list" style="margin-top:.55rem">${(trend.colors || []).slice(0, 3).map(color => `<span class="chip">${esc(color)}</span>`).join('')}</div></div>`;
   }
 
-  let currentItems = [];
+  function buildContext(styleKey) {
+    const style = STYLE_CONFIG[styleKey] || STYLE_CONFIG.neutral;
+    return {
+      updatedAt: new Date().toISOString().slice(0, 10),
+      audience: state.gender,
+      paletteHeadline: {
+        headline: `${titleCase(state.skinTone.replace('_', ' '))} skin tone + ${style.label}`,
+        bestColors: style.bestColors,
+        accents: style.accents,
+        avoid: style.avoid,
+        metals: style.metals
+      },
+      trendHighlights: style.trends.map((trend, index) => ({
+        trend,
+        season: state.gender === 'women' ? 'Spring / Summer 2026' : 'Summer / Resort 2026',
+        colors: style.bestColors.slice(index, index + 3)
+      }))
+    };
+  }
+
+  function buildItem(photo, post, user, styleKey, index) {
+    const style = STYLE_CONFIG[styleKey] || STYLE_CONFIG.neutral;
+    return {
+      item: titleCase(photo.title.split(' ').slice(0, 3).join(' ')),
+      category: ITEM_TYPES[index % ITEM_TYPES.length],
+      story: style.label,
+      priceRange: `Rs ${1499 + index * 220} - ${2499 + index * 260}`,
+      why: `${post.body.slice(0, 110)}.`,
+      styleTip: `${user.company?.catchPhrase || 'Keep the look refined'} with ${style.accents[0].toLowerCase()} accessories.`,
+      silhouette: ['tailored', 'soft', 'relaxed', 'statement'][index % 4],
+      recommendedPalette: { bestColors: style.bestColors, accents: style.accents, avoid: style.avoid },
+      patternAdvice: {
+        best: `${style.bestColors[0]} with ${style.accents[0]} accents`,
+        mix: `Build the look around ${style.label.toLowerCase()} and keep prints understated.`,
+        avoid: `Avoid mixing ${style.avoid[0]} into this edit.`
+      },
+      styleInsights: { mood: style.label, occasions: ['Daywear', 'Brunch', 'Travel'] },
+      trendSignal: { trend: style.trends[index % style.trends.length], colors: style.bestColors.slice(0, 3) },
+      retailers: [
+        { name: 'Moodboard', url: photo.url },
+        { name: 'Thumbnail', url: photo.thumbnailUrl },
+        { name: 'Story', url: `https://jsonplaceholder.typicode.com/posts/${post.id}` }
+      ],
+      imageUrl: photo.thumbnailUrl
+    };
+  }
 
   function renderCard(item, index) {
     const palette = item.recommendedPalette || {};
     const pattern = item.patternAdvice || {};
     const insights = item.styleInsights || {};
     const trendSignal = item.trendSignal;
-
     return `
       <article class="shop-experience-card">
         <div class="card-top">
-          <div class="line-art-box">${item.lineArtSvg || ''}</div>
+          <div class="line-art-box"><img src="${esc(item.imageUrl)}" alt="${esc(item.item)}"></div>
           <div>
             <div class="meta-row">
               <span class="chip chip-sage">${esc(item.category)}</span>
               <span class="chip">${esc(item.story)}</span>
-              <span class="chip chip-rose">${esc(item.priceRange || item.price_range)}</span>
+              <span class="chip chip-rose">${esc(item.priceRange)}</span>
             </div>
             <h3 class="item-name">${esc(item.item)}</h3>
             <p class="item-copy">${esc(item.why)}</p>
@@ -252,50 +272,34 @@
             </div>
           </div>
         </div>
-
         <div class="recommend-strip">
           <div>
             <span class="section-label" style="margin-bottom:.45rem">Best Color Pattern</span>
             <h4>${esc(pattern.best || 'Solid dressing')}</h4>
             <p class="pattern-copy">${esc(pattern.mix || '')}</p>
           </div>
-          <div class="chip-list">
-            ${(palette.bestColors || []).map(renderTag).join('')}
-          </div>
-          <p class="pattern-copy"><strong style="color:var(--text-primary)">Dress sketch shown above:</strong> the line image is generated from the product type so the silhouette is visible with the dress name before opening the retailer link.</p>
+          <div class="chip-list">${(palette.bestColors || []).map(renderTag).join('')}</div>
+          <p class="pattern-copy"><strong style="color:var(--text-primary)">Preview shown above:</strong> this version uses JSONPlaceholder images so the page works on GitHub Pages and other static hosts.</p>
           ${trendSignal ? `<p class="pattern-copy"><strong style="color:var(--text-primary)">Trend match:</strong> ${esc(trendSignal.trend)} · ${esc((trendSignal.colors || []).join(', '))}</p>` : ''}
-          ${item.styleTip || item.style_tip ? `<p class="pattern-copy"><strong style="color:var(--text-primary)">Styling tip:</strong> ${esc(item.styleTip || item.style_tip)}</p>` : ''}
+          <p class="pattern-copy"><strong style="color:var(--text-primary)">Styling tip:</strong> ${esc(item.styleTip)}</p>
           <p class="pattern-copy"><strong style="color:var(--text-primary)">Avoid:</strong> ${esc(pattern.avoid || 'Overcrowded prints')}</p>
         </div>
-
         <div class="links-row">
           ${(item.retailers || []).map(retailer => `<a href="${esc(retailer.url)}" target="_blank" rel="noopener" class="shop-link ${esc(retailer.name.toLowerCase().replace(/\s+/g, '-'))}">${esc(retailer.name)} ↗</a>`).join('')}
           <button type="button" class="shop-link shop-action save-cart-btn" data-index="${index}">Save To Cart</button>
         </div>
-      </article>
-    `;
+      </article>`;
   }
 
   function updateContext(context, count) {
     const palette = context.paletteHeadline || {};
-    $('updatedChip').textContent = `Updated ${context.updatedAt || '2026-03-17'}`;
+    $('updatedChip').textContent = `Updated ${context.updatedAt || '2026-03-19'}`;
     $('contextHeadline').textContent = palette.headline || 'Recommended shopping context';
-    $('contextCopy').textContent = `Showing ${count} picks for ${esc(context.audience || state.gender)} with a ${esc(state.skinTone)} skin tone. These suggestions blend shopping inventory with the latest trend signals.`;
+    $('contextCopy').textContent = `Showing ${count} picks for ${context.audience || state.gender} with a ${state.skinTone} skin tone. These suggestions are powered by JSONPlaceholder-backed demo data.`;
     $('contextGrid').innerHTML = `
-      <div class="context-pill">
-        <strong>${esc((palette.bestColors || [])[0] || 'Ivory')}</strong>
-        <span>Top color</span>
-      </div>
-      <div class="context-pill">
-        <strong>${esc((palette.accents || [])[0] || 'Camel')}</strong>
-        <span>Best neutral</span>
-      </div>
-      <div class="context-pill">
-        <strong>${esc(palette.metals || 'Gold')}</strong>
-        <span>Jewellery pairing</span>
-      </div>
-    `;
-
+      <div class="context-pill"><strong>${esc((palette.bestColors || [])[0] || 'Ivory')}</strong><span>Top color</span></div>
+      <div class="context-pill"><strong>${esc((palette.accents || [])[0] || 'Camel')}</strong><span>Best neutral</span></div>
+      <div class="context-pill"><strong>${esc(palette.metals || 'Gold')}</strong><span>Jewellery pairing</span></div>`;
     $('paletteHeadline').textContent = palette.headline || 'Best colors for this edit';
     $('bestColors').innerHTML = (palette.bestColors || []).map(renderTag).join('');
     $('accentColors').innerHTML = (palette.accents || []).map(renderTag).join('');
@@ -304,27 +308,21 @@
   }
 
   async function loadShoppingExperience() {
-    const params = new URLSearchParams({
-      category: state.category,
-      gender: state.gender,
-      skinTone: state.skinTone,
-      itemType: state.itemType,
-    });
-
     $('resultsMeta').textContent = 'Refreshing your shopping picks...';
-
     try {
-      const res = await fetch(`/api/shopping?${params.toString()}`);
-      const payload = await res.json();
-      if (!res.ok) throw new Error(payload.error || 'Failed to load shopping experience.');
-
-      const items = payload.data || [];
+      const [{ data: photos }, { data: posts }, { data: users }] = await Promise.all([
+        window.MuseApi.fetchJson(`${PLACEHOLDER}/photos?_limit=18`),
+        window.MuseApi.fetchJson(`${PLACEHOLDER}/posts?_limit=18`),
+        window.MuseApi.fetchJson(`${PLACEHOLDER}/users?_limit=6`)
+      ]);
+      const styleKey = state.category === 'all' ? 'neutral' : state.category;
+      const items = photos
+        .map((photo, index) => buildItem(photo, posts[index % posts.length], users[index % users.length], styleKey, index))
+        .filter(item => state.itemType === 'all' || item.category === state.itemType);
       currentItems = items;
-      updateContext(payload.context || {}, items.length);
+      updateContext(buildContext(styleKey), items.length);
       $('resultsMeta').textContent = `${items.length} curated picks · ${state.gender} · ${state.skinTone} skin tone`;
-      $('shopGrid').innerHTML = items.length
-        ? items.map((item, index) => renderCard(item, index)).join('')
-        : '<div class="empty-state">No items matched this combination. Try another category or item type.</div>';
+      $('shopGrid').innerHTML = items.length ? items.map((item, index) => renderCard(item, index)).join('') : '<div class="empty-state">No items matched this combination. Try another category or item type.</div>';
       document.querySelectorAll('.save-cart-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const item = currentItems[Number(btn.dataset.index)];
@@ -337,25 +335,10 @@
     }
   }
 
-  $('categorySelect').addEventListener('change', event => {
-    state.category = event.target.value;
-    loadShoppingExperience();
-  });
-
-  $('genderSelect').addEventListener('change', event => {
-    state.gender = event.target.value;
-    loadShoppingExperience();
-  });
-
-  $('skinSelect').addEventListener('change', event => {
-    state.skinTone = event.target.value;
-    loadShoppingExperience();
-  });
-
-  $('itemTypeSelect').addEventListener('change', event => {
-    state.itemType = event.target.value;
-    loadShoppingExperience();
-  });
+  $('categorySelect').addEventListener('change', event => { state.category = event.target.value; loadShoppingExperience(); });
+  $('genderSelect').addEventListener('change', event => { state.gender = event.target.value; loadShoppingExperience(); });
+  $('skinSelect').addEventListener('change', event => { state.skinTone = event.target.value; loadShoppingExperience(); });
+  $('itemTypeSelect').addEventListener('change', event => { state.itemType = event.target.value; loadShoppingExperience(); });
 
   loadShoppingExperience();
   </script>

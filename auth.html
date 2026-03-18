@@ -57,12 +57,28 @@
 
   const params = new URLSearchParams(window.location.search);
   const nextPath = params.get('next') || './index.html';
+  const placeholderBase = window.MuseApi?.placeholderBase || 'https://jsonplaceholder.typicode.com';
   const tabs = document.querySelectorAll('.auth-tab');
   const form = document.getElementById('authForm');
   const nameField = document.getElementById('nameField');
   const submitBtn = document.getElementById('submitBtn');
   const authNote = document.getElementById('authNote');
   let mode = 'login';
+
+  function getDemoUsers() {
+    try {
+      const users = JSON.parse(localStorage.getItem('muse-demo-users') || '[]');
+      return Array.isArray(users) ? users : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveDemoUser(user) {
+    const users = getDemoUsers().filter(entry => entry.email !== user.email);
+    users.push(user);
+    localStorage.setItem('muse-demo-users', JSON.stringify(users));
+  }
 
   function syncMode() {
     tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.mode === mode));
@@ -93,14 +109,46 @@
     submitBtn.textContent = mode === 'register' ? 'Creating Account...' : 'Signing In...';
 
     try {
-      const res = await fetch(`./api/auth/${mode}`, {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body.error || 'Authentication failed.');
+      let user;
+
+      if (mode === 'register') {
+        const localUser = {
+          id: `local-${Date.now()}`,
+          name: payload.name.trim() || 'MUSE Member',
+          email: payload.email.trim().toLowerCase(),
+          role: 'member',
+          createdAt: new Date().toISOString(),
+        };
+
+        await fetch(placeholderBase + '/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(localUser),
+        });
+
+        saveDemoUser(localUser);
+        user = localUser;
+      } else {
+        const localMatches = getDemoUsers().filter(entry => entry.email === payload.email.trim().toLowerCase());
+        if (localMatches.length) {
+          [user] = localMatches;
+        } else {
+          const { response, data } = await window.MuseApi.fetchJson(`${placeholderBase}/users?email=${encodeURIComponent(payload.email.trim())}`);
+          if (!response.ok || !Array.isArray(data) || !data.length) {
+            throw new Error('No account found for that email. Create an account first.');
+          }
+          const remote = data[0];
+          user = {
+            id: remote.id,
+            name: remote.name,
+            email: remote.email.toLowerCase(),
+            role: 'member',
+            createdAt: new Date().toISOString(),
+          };
+        }
+      }
+
+      localStorage.setItem('muse-user', JSON.stringify(user));
       showToast(mode === 'register' ? 'Account created successfully.' : 'Signed in successfully.', 'success');
       window.location.href = nextPath;
     } catch (err) {

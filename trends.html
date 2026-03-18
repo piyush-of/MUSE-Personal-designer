@@ -87,6 +87,53 @@
   'use strict';
 
   const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const PLACEHOLDER = window.MuseApi?.placeholderBase || 'https://jsonplaceholder.typicode.com';
+  const HEX_SETS = [
+    ['#C9816A', '#E9C9B0', '#6B8E23'],
+    ['#355C7D', '#F8B195', '#C06C84'],
+    ['#A67B52', '#F5DCCA', '#5B7B6E'],
+    ['#2F4F4F', '#D4A373', '#E9EDC9'],
+    ['#8D5A97', '#F2CC8F', '#81B29A'],
+    ['#B56576', '#E56B6F', '#6D597A']
+  ];
+  const ITEM_SETS = [
+    ['Fluid co-ords', 'Soft tailoring', 'Statement flats'],
+    ['Relaxed blazer', 'Wide-leg trousers', 'Fine jewelry'],
+    ['Textured knitwear', 'Column skirts', 'Minimal sandals'],
+    ['Layered shirting', 'Straight denim', 'Structured totes']
+  ];
+
+  function titleCase(value='') {
+    return String(value)
+      .split(/\s+/)
+      .filter(Boolean)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  function buildTrendCard(post, photo, user, audience, index) {
+    const colors = HEX_SETS[index % HEX_SETS.length];
+    const pieces = ITEM_SETS[index % ITEM_SETS.length];
+    const season = audience === 'women' ? 'Spring / Summer 2026' : 'Resort / Summer 2026';
+    const label = audience === 'women' ? 'Editorial Edit' : 'Modern Tailoring';
+    const retailer = audience === 'women' ? 'Moodboard' : 'Lookbook';
+
+    return {
+      tag: label,
+      season,
+      trend: titleCase(post.title.split(' ').slice(0, 3).join(' ')),
+      description: post.body.slice(0, 140) + '.',
+      sourceUrl: photo.url,
+      sourceLabel: user.company?.name || user.name,
+      colors: colors.map((_, idx) => ['Terracotta', 'Ivory', 'Olive', 'Ink', 'Camel', 'Rose'][((index * 2) + idx) % 6]),
+      hexColors: colors,
+      keyPieces: pieces,
+      recommendations: [
+        { item: titleCase(photo.title.split(' ').slice(0, 2).join(' ')), retailer, price: `Rs ${1499 + index * 250}`, url: photo.url },
+        { item: `${titleCase(user.company?.bs?.split(' ').slice(0, 2).join(' ') || 'Style Note')} Capsule`, retailer: 'Editorial Source', price: `Rs ${2299 + index * 300}`, url: `https://jsonplaceholder.typicode.com/posts/${post.id}` }
+      ]
+    };
+  }
 
   function renderTrendCard(t){
     const swatches=(t.hexColors||[]).map(h=>`<div class="swatch" style="background:${esc(h)}" title="${esc(h)}"></div>`).join('');
@@ -133,12 +180,17 @@
 
   async function loadTrends(){
     try{
-      const res=await fetch('./api/trends');
-      const payload=await res.json();
-      const data=payload.data||{};
-      document.getElementById('updatedAtChip').textContent=`Updated ${data.updatedAt || '2026-03-17'}`;
-      document.getElementById('womenGrid').innerHTML=(data.women||[]).map(renderTrendCard).join('');
-      document.getElementById('menGrid').innerHTML=(data.men||[]).map(renderTrendCard).join('');
+      const [{ data: posts }, { data: photos }, { data: users }] = await Promise.all([
+        window.MuseApi.fetchJson(`${PLACEHOLDER}/posts?_limit=8`),
+        window.MuseApi.fetchJson(`${PLACEHOLDER}/photos?_limit=8`),
+        window.MuseApi.fetchJson(`${PLACEHOLDER}/users?_limit=4`)
+      ]);
+
+      const women = posts.slice(0, 4).map((post, index) => buildTrendCard(post, photos[index], users[index % users.length], 'women', index));
+      const men = posts.slice(4, 8).map((post, index) => buildTrendCard(post, photos[index + 4], users[index % users.length], 'men', index + 4));
+      document.getElementById('updatedAtChip').textContent=`Updated ${new Date().toISOString().slice(0, 10)}`;
+      document.getElementById('womenGrid').innerHTML=women.map(renderTrendCard).join('');
+      document.getElementById('menGrid').innerHTML=men.map(renderTrendCard).join('');
     }catch(_err){
       document.getElementById('womenGrid').innerHTML='<p style="color:var(--text-muted);padding:2rem">Failed to load latest trends.</p>';
       document.getElementById('menGrid').innerHTML='<p style="color:var(--text-muted);padding:2rem">Failed to load latest trends.</p>';

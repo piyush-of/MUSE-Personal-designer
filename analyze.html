@@ -1,49 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Analyse - MUSE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./css/style.css">
   <style>
-    .analyze-hero { background:var(--bg-muted); padding:5rem 4rem 3rem; border-bottom:1px solid var(--border); }
-    .analyzer-wrap { background:var(--bg-base); padding:4rem; }
-    .analyzer-grid { display:grid; grid-template-columns:1fr 1fr; gap:2px; background:var(--border); margin-bottom:3rem; }
-    .a-panel { background:var(--bg-surface); padding:3rem; }
-    .panel-label { font-family:var(--f-mono); font-size:0.62rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--text-muted); margin-bottom:1.2rem; display:block; }
-    .preview-wrap { display:none; }
-    .preview-wrap img { width:100%; max-height:300px; object-fit:contain; background:var(--bg-muted); }
-    .preview-name { font-family:var(--f-mono); font-size:0.6rem; color:var(--text-muted); margin-top:0.6rem; text-align:center; }
-    .segment-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; margin-bottom:1.5rem; }
-    .segment-btn { border:1px solid var(--border); background:transparent; padding:1rem; text-align:left; cursor:pointer; transition:all var(--tr); }
-    .segment-btn.active { border-color:var(--text-primary); background:var(--bg-muted); }
-    .segment-btn strong { display:block; font-size:0.95rem; font-weight:500; }
-    .segment-btn span { display:block; color:var(--text-muted); font-size:0.8rem; margin-top:0.25rem; }
-    .results-section { display:none; padding-top:4rem; }
-    .results-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:2.5rem; }
-    .combo-dd-grid { display:grid; grid-template-columns:1fr 1fr; gap:3rem; }
-    .best-combo-list { display:grid; gap:1rem; }
-    .best-combo-card { border:1px solid var(--border); background:var(--bg-muted); padding:1rem; }
-    .dd-list { list-style:none; padding:0; }
-    .dd-list li { font-size:0.88rem; margin-bottom:0.4rem; padding-left:1.2rem; position:relative; line-height:1.5; }
-    .dd-list.dos li { color:var(--gold); }
-    .dd-list.dont li { color:#d96b6b; }
-    .dd-list.dos li::before { content:'✓'; position:absolute; left:0; color:var(--gold); }
-    .dd-list.dont li::before { content:'×'; position:absolute; left:0; color:#d96b6b; }
-    .combo { margin-bottom:1.2rem; }
-    .combo-label { font-family:var(--f-mono); font-size:0.57rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); margin-bottom:0.4rem; }
-    .combo-vibe { font-size:0.78rem; color:rgba(240,235,227,0.45); margin-top:0.25rem; font-style:italic; }
-    .shop-item { border-top:1px solid var(--border); padding:1rem 0; }
-    .shop-item:first-of-type { border-top:none; padding-top:0; }
-    .shop-item-grid { display:grid; grid-template-columns:104px 1fr; gap:0.9rem; align-items:start; }
-    .shop-head { display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem; }
-    .shop-why { font-size:0.82rem; color:var(--text-muted); line-height:1.5; margin-top:0.25rem; }
-    .shop-tip { font-style:italic; font-size:0.78rem; color:var(--sage); margin-top:0.2rem; margin-bottom:0.5rem; }
-    .shop-links { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem; }
-    .shop-sketch { border:1px solid var(--border); background:linear-gradient(180deg,#fbf7f2 0%,#f1e4d5 100%); padding:0.35rem; }
-    .shop-pattern { font-size:0.78rem; color:var(--text-secondary); line-height:1.55; margin-top:0.35rem; }
+    .analyze-hero { background: var(--bg-muted); padding: 5rem 4rem 3rem; border-bottom: 1px solid var(--border); }
+    .analyzer-wrap { background: var(--bg-base); padding: 4rem; }
+    .analyzer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--border); margin-bottom: 3rem; }
+    .a-panel { background: var(--bg-surface); padding: 3rem; }
+    .panel-label { font-family: var(--f-mono); font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.2rem; display: block; }
+    .preview-wrap { display: none; }
+    .preview-wrap img { width: 100%; max-height: 300px; object-fit: contain; background: var(--bg-muted); }
+    .preview-name { font-family: var(--f-mono); font-size: 0.6rem; color: var(--text-muted); margin-top: 0.6rem; text-align: center; }
+    .segment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.5rem; }
+    .segment-btn { border: 1px solid var(--border); background: transparent; padding: 1rem; text-align: left; cursor: pointer; transition: all var(--tr); }
+    .segment-btn.active { border-color: var(--text-primary); background: var(--bg-muted); }
+    .segment-btn strong { display: block; font-size: 0.95rem; font-weight: 500; }
+    .segment-btn span { display: block; color: var(--text-muted); font-size: 0.8rem; margin-top: 0.25rem; }
+    .results-section { display: none; padding-top: 4rem; }
+    .results-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2.5rem; }
+    .combo-dd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+    .best-combo-list { display: grid; gap: 1rem; }
+    .best-combo-card { border: 1px solid var(--border); background: var(--bg-muted); padding: 1rem; }
+    .dd-list { list-style: none; padding: 0; }
+    .dd-list li { font-size: 0.88rem; margin-bottom: 0.4rem; padding-left: 1.2rem; position: relative; line-height: 1.5; }
+    .dd-list.dos li::before { content: '✓'; position: absolute; left: 0; color: var(--gold); }
+    .dd-list.dont li::before { content: '×'; position: absolute; left: 0; color: #d96b6b; }
+    .combo { margin-bottom: 1.2rem; }
+    .combo-label { font-family: var(--f-mono); font-size: 0.57rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem; }
+    .combo-vibe { font-size: 0.78rem; color: rgba(240,235,227,0.45); margin-top: 0.25rem; font-style: italic; }
+    .shop-item { border-top: 1px solid var(--border); padding: 1rem 0; }
+    .shop-item:first-of-type { border-top: none; padding-top: 0; }
+    .shop-links { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
     @media(max-width:900px){ .analyzer-grid,.results-grid,.combo-dd-grid { grid-template-columns:1fr; } .analyzer-wrap,.analyze-hero { padding:3rem 1.5rem; } }
   </style>
 </head>
@@ -53,7 +46,7 @@
     <div class="analyze-hero">
       <span class="section-label">01 - Analysis Studio</span>
       <h1>Analyse Your <em>Outfit</em></h1>
-      <p style="color:var(--text-secondary);font-size:1rem;margin-top:0.8rem;max-width:560px">Upload any outfit photo, choose women or men, select your skin tone, and get latest combo recommendations built around your colouring.</p>
+      <p style="color:var(--text-secondary);font-size:1rem;margin-top:0.8rem;max-width:560px">Upload any outfit photo, choose your audience, select a skin tone, and get a mock style report generated from JSONPlaceholder-backed demo data.</p>
     </div>
 
     <div class="analyzer-wrap">
@@ -78,11 +71,11 @@
           <div class="segment-grid">
             <button class="segment-btn active" data-gender="women">
               <strong>Women</strong>
-              <span>Latest women's combos and trend logic</span>
+              <span>Editorial demo mode with soft tailoring logic</span>
             </button>
             <button class="segment-btn" data-gender="men">
               <strong>Men</strong>
-              <span>Latest men's combos and trend logic</span>
+              <span>Editorial demo mode with clean tailoring logic</span>
             </button>
           </div>
           <div class="skin-grid">
@@ -103,7 +96,7 @@
 
       <div class="loading-block" id="loadingBlock">
         <div class="spinner"></div>
-        <p style="font-family:var(--f-display);font-size:1.1rem;color:var(--text-muted);font-style:italic;margin-top:0.5rem">Analysing your colours...</p>
+        <p style="font-family:var(--f-display);font-size:1.1rem;color:var(--text-muted);font-style:italic;margin-top:0.5rem">Generating your style report...</p>
         <p style="font-family:var(--f-mono);font-size:0.6rem;color:var(--text-muted);margin-top:0.4rem;letter-spacing:0.1em" id="loadStep"></p>
       </div>
 
@@ -117,7 +110,7 @@
     <footer class="site-footer" style="margin-top:0">
       <div class="footer-bottom" style="border-top:none;padding-top:0">
         <p>&copy; 2026 MUSE Studio</p>
-        <p>Skin-tone combo engine for women and men</p>
+        <p>Static-friendly analysis mode powered by JSONPlaceholder demo data</p>
       </div>
     </footer>
   </main>
@@ -126,158 +119,186 @@
   <script>
   'use strict';
 
-  const SKIN_INFO={porcelain:{name:'Porcelain / Rose Ivory'},fair:{name:'Fair / Ivory'},light:{name:'Light / Warm Beige'},light_medium:{name:'Light-Medium / Honey Beige'},medium:{name:'Medium / Golden Olive'},olive:{name:'Olive / Neutral Gold'},tan:{name:'Tan / Caramel'},deep:{name:'Deep / Rich Brown'},rich:{name:'Rich / Espresso Brown'},ebony:{name:'Ebony / Deep Cool Brown'}};
-  const S={file:null,skin:null,gender:'women',busy:false};
-  let currentShopItems=[];
-  const $=id=>document.getElementById(id);
-  const D={fileInput:$('fileInput'),uploadZone:$('uploadZone'),previewWrap:$('previewWrap'),previewImg:$('previewImg'),previewName:$('previewName'),changeBtn:$('changeBtn'),skinOpts:document.querySelectorAll('.skin-opt'),genderBtns:document.querySelectorAll('.segment-btn'),analyzeBtn:$('analyzeBtn'),loadingBlock:$('loadingBlock'),loadStep:$('loadStep'),resultsSection:$('resultsSection'),resultsGrid:$('resultsGrid')};
-  const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  const chips=(arr,cls)=>(arr??[]).map(t=>`<span class="chip ${cls}">${esc(t)}</span>`).join('');
+  const PLACEHOLDER = window.MuseApi?.placeholderBase || 'https://jsonplaceholder.typicode.com';
+  const SKIN_INFO = {
+    porcelain:{name:'Porcelain / Rose Ivory', best:['Blush', 'Soft Blue', 'Ivory'], avoid:['Harsh Orange', 'Neon Green'], neutrals:['Pearl', 'Stone']},
+    fair:{name:'Fair / Ivory', best:['Dusty Rose', 'Sage', 'Cream'], avoid:['Acid Yellow', 'Jet Black'], neutrals:['Taupe', 'Warm Grey']},
+    light:{name:'Light / Warm Beige', best:['Coral', 'Olive', 'Sand'], avoid:['Icy Lilac', 'Neon Pink'], neutrals:['Camel', 'Ecru']},
+    light_medium:{name:'Light-Medium / Honey Beige', best:['Terracotta', 'Teal', 'Ivory'], avoid:['Ash Grey', 'Lemon'], neutrals:['Toffee', 'Stone']},
+    medium:{name:'Medium / Golden Olive', best:['Terracotta', 'Deep Olive', 'Copper'], avoid:['Powder Grey', 'Ice Blue'], neutrals:['Camel', 'Espresso']},
+    olive:{name:'Olive / Neutral Gold', best:['Rust', 'Moss', 'Warm White'], avoid:['Cool Purple', 'Cold Mint'], neutrals:['Sand', 'Cocoa']},
+    tan:{name:'Tan / Caramel', best:['Paprika', 'Forest', 'Amber'], avoid:['Frosted Pink', 'Silver Blue'], neutrals:['Coffee', 'Cream']},
+    deep:{name:'Deep / Rich Brown', best:['Cobalt', 'Marigold', 'Brick'], avoid:['Dusty Beige', 'Pale Grey'], neutrals:['Espresso', 'Ivory']},
+    rich:{name:'Rich / Espresso Brown', best:['Ruby', 'Peacock', 'Bronze'], avoid:['Washed Peach', 'Ash Lilac'], neutrals:['Mocha', 'Soft White']},
+    ebony:{name:'Ebony / Deep Cool Brown', best:['Fuchsia', 'Emerald', 'Gold'], avoid:['Muted Taupe', 'Pale Yellow'], neutrals:['Onyx', 'Cream']}
+  };
+  const S = { file:null, skin:null, gender:'women', busy:false };
+  let currentShopItems = [];
+  const $ = id => document.getElementById(id);
+  const D = { fileInput:$('fileInput'), uploadZone:$('uploadZone'), previewWrap:$('previewWrap'), previewImg:$('previewImg'), previewName:$('previewName'), changeBtn:$('changeBtn'), skinOpts:document.querySelectorAll('.skin-opt'), genderBtns:document.querySelectorAll('.segment-btn'), analyzeBtn:$('analyzeBtn'), loadingBlock:$('loadingBlock'), loadStep:$('loadStep'), resultsSection:$('resultsSection'), resultsGrid:$('resultsGrid') };
+  const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const chips = (arr, cls='') => (arr || []).map(t => `<span class="chip ${cls}">${esc(t)}</span>`).join('');
 
-  function sketchForCategory(category){
-    const kind=String(category||'').toLowerCase();
-    const shapes={
-      dress:'<path d="M40 18c2-6 9-10 16-10s14 4 16 10l4 11c1 4 5 8 9 10l9 6-12 12-5 31H35l-5-31-12-12 9-6c4-2 8-6 9-10l4-11Z" /><path d="M46 29h20" /><path d="M40 55h32" stroke="#B5674D" />',
-      'co-ord':'<path d="M40 18c2-6 9-10 16-10s14 4 16 10l4 11c1 4 5 8 9 10l9 6-12 12-5 31H35l-5-31-12-12 9-6c4-2 8-6 9-10l4-11Z" /><path d="M46 29h20" /><path d="M40 55h32" stroke="#B5674D" />',
-      tops:'<path d="M36 17c3-6 9-9 15-9h10c6 0 12 3 15 9l8 13-11 10-7 48H30l-7-48-11-10 8-13Z" /><path d="M40 31h32" stroke="#B5674D" />',
-      bottoms:'<path d="M33 12h46l6 24-8 52H57l-5-30-5 30H27l-8-52 14-24Z" /><path d="M33 12l11 25" /><path d="M79 12 68 37" />',
-      outerwear:'<path d="M35 13h48l9 15-13 12-8 48H47l-3-26-3 26H17L9 40-4 28l9-15Z" /><path d="M59 13v75" stroke="#B5674D" /><path d="M43 33h31" />',
-      footwear:'<path d="M13 61c8 0 14-6 20-15l6-9 10 2c5 2 9 5 14 9l12 12c3 3 7 4 11 4h7v10H13c-6 0-10-3-10-7s4-6 10-6Z" /><path d="M38 39c5 7 11 11 17 14" stroke="#B5674D" />',
-      accessories:'<path d="M24 31h64l-4 51c-1 7-6 11-13 11H41c-7 0-12-4-13-11l-4-51Z" /><path d="M40 31c0-13 8-22 16-22s16 9 16 22" /><path d="M37 50h38" stroke="#B5674D" />'
+  function handleFile(file) {
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { showToast('Max file size is 10 MB.'); return; }
+    if (!['image/jpeg','image/png','image/webp','image/gif'].includes(file.type)) { showToast('Please upload JPG, PNG or WEBP.'); return; }
+    S.file = file;
+    const reader = new FileReader();
+    reader.onload = event => {
+      D.previewImg.src = event.target.result;
+      D.previewName.textContent = file.name;
+      D.uploadZone.style.display = 'none';
+      D.previewWrap.style.display = 'block';
     };
-    const markup=shapes[kind]||shapes.dress;
-    return `<svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g fill="none" stroke="#1A1714" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${markup}</g></svg>`;
-  }
-
-  function handleFile(f){
-    if(!f)return;
-    if(f.size>10*1024*1024){showToast('Max file size is 10 MB.');return;}
-    if(!['image/jpeg','image/png','image/webp','image/gif'].includes(f.type)){showToast('Please upload JPG, PNG or WEBP.');return;}
-    S.file=f;
-    const reader=new FileReader();
-    reader.onload=ev=>{D.previewImg.src=ev.target.result;D.previewName.textContent=f.name;D.uploadZone.style.display='none';D.previewWrap.style.display='block';};
-    reader.readAsDataURL(f);
+    reader.readAsDataURL(file);
     sync();
   }
 
-  function resetUpload(){
-    S.file=null;
-    D.fileInput.value='';
-    D.previewWrap.style.display='none';
-    D.uploadZone.style.display='flex';
+  function resetUpload() {
+    S.file = null;
+    D.fileInput.value = '';
+    D.previewWrap.style.display = 'none';
+    D.uploadZone.style.display = 'flex';
     sync();
   }
 
-  function sync(){
-    D.analyzeBtn.disabled=!(S.file&&S.skin&&!S.busy);
+  function sync() {
+    D.analyzeBtn.disabled = !(S.file && S.skin && !S.busy);
   }
 
-  function setLoading(on,step=''){
-    S.busy=on;
+  function setLoading(on, step='') {
+    S.busy = on;
     sync();
-    D.loadingBlock.classList.toggle('active',on);
-    D.loadStep.textContent=step;
-    D.analyzeBtn.textContent=on?'Analysing...':'Analyse My Style';
-    if(on) D.resultsSection.style.display='none';
+    D.loadingBlock.classList.toggle('active', on);
+    D.loadStep.textContent = step;
+    D.analyzeBtn.textContent = on ? 'Analysing...' : 'Analyse My Style';
+    if (on) D.resultsSection.style.display = 'none';
   }
 
-  async function run(){
-    if(!S.file||!S.skin||S.busy)return;
-    setLoading(true,'Uploading image...');
-    try{
-      const form=new FormData();
-      form.append('image',S.file);
-      form.append('skinTone',S.skin);
-      form.append('gender',S.gender);
-      D.loadStep.textContent='Analysing colours and best combos...';
-      const res=await fetch('./api/analyze',{method:'POST',body:form});
-      const body=await res.json();
-      if(!res.ok) throw new Error(body.error||(body.errors?.join(' '))||'Error');
-      renderResults(body.data);
-      D.resultsSection.style.display='block';
-      D.resultsSection.scrollIntoView({behavior:'smooth'});
-      showToast('Analysis complete!','success');
-    }catch(err){
-      showToast(err.message||'Something went wrong.');
-    }finally{
+  function buildAnalysis(post, user, photo) {
+    const skin = SKIN_INFO[S.skin] || SKIN_INFO.medium;
+    const score = 78 + (photo.id % 18);
+    const category = S.gender === 'women' ? 'Editorial Daywear' : 'Modern Smart Casual';
+    currentShopItems = [
+      { item: 'Structured Layer', price_range: 'Rs 1899 - 2599', category: 'Outerwear', why: post.body.slice(0, 90) + '.', style_tip: `Pair with ${skin.neutrals[0]} separates.`, retailers: [{ name: 'Image', url: photo.url }, { name: 'Story', url: `https://jsonplaceholder.typicode.com/posts/${post.id}` }] },
+      { item: 'Soft Base Piece', price_range: 'Rs 1299 - 1999', category: 'Tops', why: user.company.catchPhrase + '.', style_tip: `Keep the neckline clean and use ${skin.best[0].toLowerCase()} near the face.`, retailers: [{ name: 'Thumb', url: photo.thumbnailUrl }, { name: 'Profile', url: `https://jsonplaceholder.typicode.com/users/${user.id}` }] }
+    ];
+    return {
+      outfit_analysis: {
+        style_category: category,
+        description: `This uploaded look reads as ${category.toLowerCase()} with a polished silhouette and balanced styling energy.`,
+        occasion: S.gender === 'women' ? 'Day Event' : 'Work / Smart Casual',
+        season: 'Spring / Summer',
+        feedback: `${user.company.bs.split(' ').slice(0, 5).join(' ')} inspired the styling direction for this demo report.`,
+        detected_colors: skin.best
+      },
+      skin_palette: {
+        summary: `${skin.name} is best supported by rich, clear tones with supportive neutrals that keep contrast polished.`,
+        hex_palette: ['#C9816A', '#B8860B', '#6B8E23', '#CD853F', '#2F8B8B', '#F5E6D3'],
+        best_colors: skin.best,
+        avoid_colors: skin.avoid,
+        neutrals: skin.neutrals
+      },
+      shopping_picks: {
+        intro: 'Here are two demo shopping directions generated from JSONPlaceholder-backed content.',
+        items: currentShopItems
+      },
+      combo_suggestions: {
+        intro: 'Use these formulas to build around the uploaded look.',
+        combos: [
+          { name: 'Refined Contrast', occasion: 'Daywear', pieces: [skin.best[0], skin.neutrals[0], 'Clean tailoring'], vibe: 'Confident, warm, and polished.' },
+          { name: 'Soft Editorial', occasion: 'Weekend', pieces: [skin.best[1], skin.neutrals[1], 'Relaxed layers'], vibe: 'Easy elegance with visual depth.' }
+        ]
+      },
+      best_combo_matches: {
+        intro: 'Top combinations for your selected skin tone.',
+        combos: [
+          { name: 'Hero Palette', match_score: score, colors: skin.best, pieces: ['Top layer', 'Base piece', 'Accent accessory'], why_match: `The ${skin.best[0].toLowerCase()} note adds life while ${skin.neutrals[0].toLowerCase()} keeps the outfit grounded.` }
+        ]
+      },
+      style_dos_donts: {
+        dos: [`Lead with ${skin.best[0]} near the face.`, `Use ${skin.neutrals[0]} as the base neutral.`, 'Keep one focal color and one soft support tone.'],
+        donts: [`Avoid relying on ${skin.avoid[0].toLowerCase()} as the hero color.`, 'Do not stack too many unrelated prints.', 'Avoid washing out the look with low-contrast neutrals only.']
+      }
+    };
+  }
+
+  async function run() {
+    if (!S.file || !S.skin || S.busy) return;
+    setLoading(true, 'Loading JSONPlaceholder demo data...');
+    try {
+      const [{ data: post }, { data: user }, { data: photo }] = await Promise.all([
+        window.MuseApi.fetchJson(`${PLACEHOLDER}/posts/${(S.file.name.length % 10) + 1}`),
+        window.MuseApi.fetchJson(`${PLACEHOLDER}/users/${(S.file.name.length % 5) + 1}`),
+        window.MuseApi.fetchJson(`${PLACEHOLDER}/photos/${(S.file.name.length % 20) + 1}`)
+      ]);
+      renderResults(buildAnalysis(post, user, photo));
+      D.resultsSection.style.display = 'block';
+      D.resultsSection.scrollIntoView({ behavior: 'smooth' });
+      showToast('Analysis complete!', 'success');
+    } catch (err) {
+      showToast(err.message || 'Something went wrong.');
+    } finally {
       setLoading(false);
     }
   }
 
-  function renderResults(data){
-    const {outfit_analysis:oa,skin_palette:sp,shopping_picks:sh,combo_suggestions:cs,best_combo_matches:bc,style_dos_donts:dd}=data;
-    const score=Math.max(0,Math.min(100,Number(oa.score??50)));
-    const hexStrip=(sp.hex_palette??[]).slice(0,6).map(h=>`<div style="background:${esc(h)}"></div>`).join('');
-    currentShopItems=sh.items??[];
-    const shopHTML=currentShopItems.map((it,index)=>`
+  function renderResults(data) {
+    const oa = data.outfit_analysis;
+    const sp = data.skin_palette;
+    const sh = data.shopping_picks;
+    const cs = data.combo_suggestions;
+    const bc = data.best_combo_matches;
+    const dd = data.style_dos_donts;
+    const score = Number(bc.combos[0]?.match_score || 82);
+    const hexStrip = (sp.hex_palette || []).slice(0, 6).map(h => `<div style="background:${esc(h)}"></div>`).join('');
+    const shopHTML = (sh.items || []).map((it, index) => `
       <div class="shop-item">
-        <div class="shop-item-grid">
-          <div class="shop-sketch">${sketchForCategory(it.category)}</div>
+        <div style="display:flex;justify-content:space-between;gap:.75rem;align-items:flex-start">
           <div>
-            <div class="shop-head"><span style="font-family:var(--f-display);font-size:1rem">${esc(it.item)}</span><span class="chip">${esc(it.price_range)}</span></div>
-            ${it.category?`<span class="chip chip-sage" style="margin-top:.3rem;font-size:.5rem">${esc(it.category)}</span>`:''}
-            <p class="shop-why">${esc(it.why)}</p>
-            ${it.style_tip?`<p class="shop-tip">💡 ${esc(it.style_tip)}</p>`:''}
-            <p class="shop-pattern">Best pattern direction: keep this piece in a strong solid or a subtle print so the color story stays polished.</p>
-            <div class="shop-links">
-              ${(it.retailers??[]).map(retailer=>`<a href="${esc(retailer.url)}" target="_blank" rel="noopener" class="shop-link ${esc(retailer.name.toLowerCase().replace(/\s+/g,'-'))}">${esc(retailer.name)} ↗</a>`).join('')}
-              <button type="button" class="shop-link shop-action save-cart-btn" data-index="${index}">Save To Cart</button>
-            </div>
+            <div style="font-family:var(--f-display);font-size:1rem">${esc(it.item)}</div>
+            <div class="chip-list" style="margin-top:.35rem"><span class="chip chip-sage">${esc(it.category)}</span><span class="chip">${esc(it.price_range)}</span></div>
           </div>
         </div>
+        <p style="margin-top:.65rem;color:var(--text-muted)">${esc(it.why)}</p>
+        <p style="margin-top:.35rem;color:var(--sage);font-style:italic">${esc(it.style_tip)}</p>
+        <div class="shop-links">${(it.retailers || []).map(retailer => `<a href="${esc(retailer.url)}" target="_blank" rel="noopener" class="shop-link">${esc(retailer.name)} ↗</a>`).join('')}<button type="button" class="shop-link shop-action save-cart-btn" data-index="${index}">Save To Cart</button></div>
       </div>`).join('');
-    const comboHTML=(cs.combos??[]).map(c=>`<div class="combo"><div class="combo-label">${esc(c.name)} · ${esc(c.occasion)}</div><div class="chip-list">${(c.pieces??[]).map(p=>`<span class="chip chip-accent">${esc(p)}</span>`).join('')}</div><p class="combo-vibe">${esc(c.vibe)}</p></div>`).join('');
-    const bestComboHTML=(bc.combos??[]).map(c=>`
-      <div class="best-combo-card">
-        <div class="combo-label">${esc(c.name)} · Match ${esc(c.match_score)}/100</div>
-        <div class="chip-list" style="margin-bottom:.6rem">${(c.colors??[]).map(color=>`<span class="chip chip-gold">${esc(color)}</span>`).join('')}</div>
-        <div class="chip-list">${(c.pieces??[]).map(piece=>`<span class="chip chip-accent">${esc(piece)}</span>`).join('')}</div>
-        <p style="font-size:.84rem;color:var(--text-muted);margin-top:.65rem;line-height:1.6">${esc(c.why_match)}</p>
-      </div>`).join('');
-    const dosList=(dd?.dos??[]).map(item=>`<li>${esc(item)}</li>`).join('');
-    const dontList=(dd?.donts??[]).map(item=>`<li>${esc(item)}</li>`).join('');
-    const skinName=SKIN_INFO[S.skin]?.name||'';
-
-    D.resultsGrid.innerHTML=`
+    const comboHTML = (cs.combos || []).map(c => `<div class="combo"><div class="combo-label">${esc(c.name)} · ${esc(c.occasion)}</div><div class="chip-list">${(c.pieces || []).map(p => `<span class="chip chip-accent">${esc(p)}</span>`).join('')}</div><p class="combo-vibe">${esc(c.vibe)}</p></div>`).join('');
+    const bestComboHTML = (bc.combos || []).map(c => `<div class="best-combo-card"><div class="combo-label">${esc(c.name)} · Match ${esc(c.match_score)}/100</div><div class="chip-list" style="margin-bottom:.6rem">${(c.colors || []).map(color => `<span class="chip chip-gold">${esc(color)}</span>`).join('')}</div><div class="chip-list">${(c.pieces || []).map(piece => `<span class="chip chip-accent">${esc(piece)}</span>`).join('')}</div><p style="font-size:.84rem;color:var(--text-muted);margin-top:.65rem;line-height:1.6">${esc(c.why_match)}</p></div>`).join('');
+    D.resultsGrid.innerHTML = `
       <div class="result-card">
         <div class="rc-label">Outfit Assessment</div>
         <div class="rc-title">${esc(oa.style_category)}</div>
         <div class="rc-body">
           <p>${esc(oa.description)}</p>
-          <div class="chip-list" style="margin-top:.9rem">
-            <span class="chip chip-rose">Score ${score}/100</span>
-            <span class="chip">${esc(oa.occasion)}</span>
-            <span class="chip">${esc(oa.season)}</span>
-          </div>
+          <div class="chip-list" style="margin-top:.9rem"><span class="chip chip-rose">Score ${score}/100</span><span class="chip">${esc(oa.occasion)}</span><span class="chip">${esc(oa.season)}</span></div>
           <div class="score-bar"><div class="score-fill" style="width:${score}%"></div></div>
           <p style="margin-top:1rem">${esc(oa.feedback)}</p>
-          ${oa.detected_colors?.length?`<p class="section-label" style="margin-top:1rem;font-size:.55rem">Detected Colours</p><div class="chip-list">${chips(oa.detected_colors,'chip chip-gold')}</div>`:''}
+          <p class="section-label" style="margin-top:1rem;font-size:.55rem">Detected Colours</p>
+          <div class="chip-list">${chips(oa.detected_colors, 'chip chip-gold')}</div>
         </div>
       </div>
-
       <div class="result-card">
-        <div class="rc-label">Colour Palette · ${esc(skinName)}</div>
+        <div class="rc-label">Colour Palette · ${esc((SKIN_INFO[S.skin] || {}).name || '')}</div>
         <div class="rc-title">Your Best Colours</div>
         <div class="rc-body">
           <p>${esc(sp.summary)}</p>
-          ${hexStrip?`<div class="palette-strip">${hexStrip}</div>`:''}
+          <div class="palette-strip">${hexStrip}</div>
           <p class="section-label" style="margin-top:1rem;font-size:.55rem">Wear These</p>
-          <div class="chip-list">${chips(sp.best_colors,'chip chip-rose')}</div>
+          <div class="chip-list">${chips(sp.best_colors, 'chip chip-rose')}</div>
           <p class="section-label" style="margin-top:1rem;font-size:.55rem">Avoid These</p>
-          <div class="chip-list">${chips(sp.avoid_colors,'chip chip-avoid')}</div>
-          ${sp.neutrals?.length?`<p class="section-label" style="margin-top:1rem;font-size:.55rem">Best Neutrals</p><div class="chip-list">${chips(sp.neutrals,'chip chip-gold')}</div>`:''}
+          <div class="chip-list">${chips(sp.avoid_colors, 'chip chip-avoid')}</div>
+          <p class="section-label" style="margin-top:1rem;font-size:.55rem">Best Neutrals</p>
+          <div class="chip-list">${chips(sp.neutrals, 'chip chip-gold')}</div>
         </div>
       </div>
-
       <div class="result-card">
         <div class="rc-label">Shopping Picks</div>
         <div class="rc-title">What To Buy Next</div>
-        <div class="rc-body">
-          <p style="margin-bottom:.8rem">${esc(sh.intro)}</p>
-          ${shopHTML}
-        </div>
+        <div class="rc-body"><p style="margin-bottom:.8rem">${esc(sh.intro)}</p>${shopHTML}</div>
       </div>
-
       <div class="result-card rc-full" style="grid-column:1/-1;padding:2.5rem">
         <div class="combo-dd-grid">
           <div>
@@ -290,34 +311,28 @@
             <div class="rc-title" style="color:var(--text-inverse)">${esc(cs.intro)}</div>
             <div style="margin-top:1.4rem">${comboHTML}</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1.6rem">
-              <div><p style="font-family:var(--f-mono);font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem">Do</p><ul class="dd-list dos">${dosList}</ul></div>
-              <div><p style="font-family:var(--f-mono);font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;color:#d96b6b;margin-bottom:.5rem">Don't</p><ul class="dd-list dont">${dontList}</ul></div>
+              <div><p style="font-family:var(--f-mono);font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem">Do</p><ul class="dd-list dos">${(dd.dos || []).map(item => `<li>${esc(item)}</li>`).join('')}</ul></div>
+              <div><p style="font-family:var(--f-mono);font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;color:#d96b6b;margin-bottom:.5rem">Don't</p><ul class="dd-list dont">${(dd.donts || []).map(item => `<li>${esc(item)}</li>`).join('')}</ul></div>
             </div>
           </div>
         </div>
       </div>`;
-
-    D.resultsGrid.querySelectorAll('.save-cart-btn').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        const item=currentShopItems[Number(btn.dataset.index)];
-        if(!item||!window.MuseCart) return;
-        window.MuseCart.addItem({
-          ...item,
-          lineArtSvg: sketchForCategory(item.category),
-          story: oa.style_category,
-        });
+    D.resultsGrid.querySelectorAll('.save-cart-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = currentShopItems[Number(btn.dataset.index)];
+        if (item && window.MuseCart) window.MuseCart.addItem(item);
       });
     });
   }
 
-  D.fileInput.addEventListener('change',e=>handleFile(e.target.files[0]));
-  D.uploadZone.addEventListener('dragover',e=>{e.preventDefault();D.uploadZone.classList.add('drag');});
-  D.uploadZone.addEventListener('dragleave',()=>D.uploadZone.classList.remove('drag'));
-  D.uploadZone.addEventListener('drop',e=>{e.preventDefault();D.uploadZone.classList.remove('drag');handleFile(e.dataTransfer.files[0]);});
-  D.changeBtn.addEventListener('click',resetUpload);
-  D.skinOpts.forEach(el=>el.addEventListener('click',()=>{S.skin=el.dataset.tone;D.skinOpts.forEach(o=>o.classList.remove('selected'));el.classList.add('selected');sync();}));
-  D.genderBtns.forEach(btn=>btn.addEventListener('click',()=>{S.gender=btn.dataset.gender;D.genderBtns.forEach(item=>item.classList.remove('active'));btn.classList.add('active');}));
-  D.analyzeBtn.addEventListener('click',run);
+  D.fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+  D.uploadZone.addEventListener('dragover', e => { e.preventDefault(); D.uploadZone.classList.add('drag'); });
+  D.uploadZone.addEventListener('dragleave', () => D.uploadZone.classList.remove('drag'));
+  D.uploadZone.addEventListener('drop', e => { e.preventDefault(); D.uploadZone.classList.remove('drag'); handleFile(e.dataTransfer.files[0]); });
+  D.changeBtn.addEventListener('click', resetUpload);
+  D.skinOpts.forEach(el => el.addEventListener('click', () => { S.skin = el.dataset.tone; D.skinOpts.forEach(o => o.classList.remove('selected')); el.classList.add('selected'); sync(); }));
+  D.genderBtns.forEach(btn => btn.addEventListener('click', () => { S.gender = btn.dataset.gender; D.genderBtns.forEach(item => item.classList.remove('active')); btn.classList.add('active'); }));
+  D.analyzeBtn.addEventListener('click', run);
   </script>
 </body>
 </html>
