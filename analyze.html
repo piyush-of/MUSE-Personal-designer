@@ -110,6 +110,7 @@
       <div class="results-section" id="resultsSection">
         <span class="section-label">02 - Your Style Report</span>
         <h2>Your personalised <em>analysis</em></h2>
+        <p id="saveStatus" style="display:none; color:var(--rose); font-family:var(--f-mono); font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase; margin-top:0.4rem">✦ Saved to your wardrobe</p>
         <div class="results-grid" id="resultsGrid"></div>
       </div>
     </div>
@@ -181,45 +182,6 @@
     if(on) D.resultsSection.style.display='none';
   }
 
-<<<<<<< ours
-  async function run() {
-    if (!S.file || !S.skin || S.busy) return;
-    setLoading(true, 'Trying local analysis service...');
-    try {
-      let analysisData = null;
-
-      try {
-        const form = new FormData();
-        form.append('image', S.file);
-        form.append('skinTone', S.skin);
-        form.append('gender', S.gender);
-        D.loadStep.textContent = 'Calling local /api/analyze with Groq enhancement...';
-        const { response, data } = await window.MuseApi.fetchJson('./api/analyze', {
-          method: 'POST',
-          body: form
-        });
-        if (!response.ok) {
-          throw new Error(data?.error || 'Local analysis failed.');
-        }
-        analysisData = data?.data || null;
-      } catch (_localError) {
-        D.loadStep.textContent = 'Local API unavailable, switching to demo mode...';
-        const [{ data: post }, { data: user }, { data: photo }] = await Promise.all([
-          window.MuseApi.fetchJson(`${PLACEHOLDER}/posts/${(S.file.name.length % 10) + 1}`),
-          window.MuseApi.fetchJson(`${PLACEHOLDER}/users/${(S.file.name.length % 5) + 1}`),
-          window.MuseApi.fetchJson(`${PLACEHOLDER}/photos/${(S.file.name.length % 20) + 1}`)
-        ]);
-        analysisData = buildAnalysis(post, user, photo);
-      }
-
-      renderResults(analysisData);
-      D.resultsSection.style.display = 'block';
-      D.resultsSection.scrollIntoView({ behavior: 'smooth' });
-      showToast('Analysis complete!', 'success');
-    } catch (err) {
-      showToast(err.message || 'Something went wrong.');
-    } finally {
-=======
   async function run(){
     if(!S.file||!S.skin||S.busy)return;
     setLoading(true,'Uploading image...');
@@ -229,17 +191,21 @@
       form.append('skinTone',S.skin);
       form.append('gender',S.gender);
       D.loadStep.textContent='Analysing colours and best combos...';
-      const res=await fetch('./api/analyze',{method:'POST',body:form});
+      const res=await museFetch('./api/analyze',{method:'POST',body:form});
       const body=await res.json();
       if(!res.ok) throw new Error(body.error||(body.errors?.join(' '))||'Error');
       renderResults(body.data);
+      if (body.savedRecordId) {
+        document.getElementById('saveStatus').style.display = 'block';
+      } else {
+        document.getElementById('saveStatus').style.display = 'none';
+      }
       D.resultsSection.style.display='block';
       D.resultsSection.scrollIntoView({behavior:'smooth'});
       showToast('Analysis complete!','success');
     }catch(err){
       showToast(err.message||'Something went wrong.');
     }finally{
->>>>>>> theirs
       setLoading(false);
     }
   }

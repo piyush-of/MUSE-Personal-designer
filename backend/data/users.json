@@ -27,19 +27,9 @@
   ],
   "sessions": [
     {
-      "token": "932582952c3b69bcffdd4d7ced7ded72b2ea16014411620f71cc6be1d5c83d67",
-      "userId": "3a7165ab-fa0f-41e1-8a03-35a1caccbb3e",
-      "expiresAt": "2026-03-24T17:32:20.621Z"
-    },
-    {
-      "token": "8efe38286ac0ec01cfa9d95ec461dec9c90c42623dc1de336c3b00a8225fe231",
+      "token": "f668c591536991defafd480727bad069733b314a89f0cf1a890b10e567e0a997",
       "userId": "4227d36b-b902-4bb4-b92b-98443bb86ab4",
-      "expiresAt": "2026-03-24T18:13:18.885Z"
-    },
-    {
-      "token": "ce37269609d62a6ef16d87362e1ae68e54a1b5933cc412afe3475e703113f9f0",
-      "userId": "fd15c61b-488b-4904-82ab-f18c274baccf",
-      "expiresAt": "2026-03-25T18:18:55.377Z"
+      "expiresAt": "2026-04-03T16:01:48.425Z"
     }
   ]
 }

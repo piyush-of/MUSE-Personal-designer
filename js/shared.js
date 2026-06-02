@@ -20,6 +20,23 @@ function apiHref(path) {
   return `./api/${String(path || '').replace(/^\/+/, '')}`;
 }
 
+function getCookie(name) {
+  return document.cookie
+    .split('; ')
+    .find(row => row.startsWith(`${name}=`))
+    ?.split('=')
+    .slice(1)
+    .join('=') || '';
+}
+
+function addCsrfHeader(headers, method = 'GET') {
+  const mutates = !['GET', 'HEAD', 'OPTIONS'].includes(String(method || 'GET').toUpperCase());
+  const token = getCookie('muse_csrf');
+  if (mutates && token) {
+    headers['X-CSRF-Token'] = decodeURIComponent(token);
+  }
+}
+
 function initTheme() {
   const saved = localStorage.getItem('muse-theme') || 'light';
   document.documentElement.setAttribute('data-theme', saved);
@@ -77,9 +94,51 @@ function initScrollLinks() {
   });
 }
 
+async function museFetch(url, options = {}) {
+  options.headers = options.headers || {};
+  addCsrfHeader(options.headers, options.method);
+  const token = localStorage.getItem('muse-token');
+  if (token) {
+    options.headers['Authorization'] = `Bearer ${token}`;
+  }
+  options.credentials = 'same-origin';
+
+  let res = await fetch(url, options);
+
+  if (res.status === 401 && !url.includes('auth/refresh') && !url.includes('auth/login')) {
+    try {
+      const refreshRes = await fetch(apiHref('auth/refresh'), {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': decodeURIComponent(getCookie('muse_csrf')),
+        }
+      });
+      if (refreshRes.ok) {
+        const body = await refreshRes.json();
+        if (body.success && body.accessToken) {
+          localStorage.setItem('muse-token', body.accessToken);
+          localStorage.setItem('muse-user', JSON.stringify(body.user));
+          options.headers['Authorization'] = `Bearer ${body.accessToken}`;
+          res = await fetch(url, options);
+        }
+      } else {
+        localStorage.removeItem('muse-token');
+        localStorage.removeItem('muse-user');
+      }
+    } catch (err) {
+      console.error('Token refresh failed:', err);
+    }
+  }
+  return res;
+}
+
+window.museFetch = museFetch;
+
 async function fetchCurrentUser() {
   try {
-    const res = await fetch(apiHref('auth/me'), { credentials: 'same-origin' });
+    const res = await museFetch(apiHref('auth/me'));
     if (!res.ok) return null;
     const body = await res.json();
     return body.user || null;
@@ -90,13 +149,13 @@ async function fetchCurrentUser() {
 
 async function logout() {
   try {
-    await fetch(apiHref('auth/logout'), {
+    await museFetch(apiHref('auth/logout'), {
       method: 'POST',
-      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
     });
   } finally {
     localStorage.removeItem('muse-user');
+    localStorage.removeItem('muse-token');
     activeUser = null;
     showToast('Signed out successfully.', 'success');
     window.location.href = pageHref('index.html');
@@ -194,6 +253,7 @@ function renderAuthNav(user) {
             <span>${user.email || 'MUSE member'}</span>
           </div>
           <a href="${pageHref('cart.html')}" class="profile-link">Cart / Wishlist <span class="profile-link__count">${count}</span></a>
+          <a href="${pageHref('wardrobe.html')}" class="profile-link">My Wardrobe / Looks</a>
           <a href="${pageHref('shopping.html')}" class="profile-link">Continue Shopping</a>
           <button class="profile-link profile-link--button" id="logoutBtn" type="button">Logout</button>
         </div>

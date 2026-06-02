@@ -101,6 +101,14 @@
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error || 'Authentication failed.');
+
+      if (body.accessToken) {
+        localStorage.setItem('muse-token', body.accessToken);
+      }
+      if (body.user) {
+        localStorage.setItem('muse-user', JSON.stringify(body.user));
+      }
+
       showToast(mode === 'register' ? 'Account created successfully.' : 'Signed in successfully.', 'success');
       window.location.href = nextPath;
     } catch (err) {

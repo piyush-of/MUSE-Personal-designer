@@ -307,8 +307,6 @@ async function analyse(buffer,skinTone,gender='women'){
   const pixels=await extractColors(buffer);
   const colorNames=pixels.map(({r,g,b})=>{for(const c of COLOR_CATEGORIES)if(c.test(r,g,b))return c.name;return'Mixed Tone';});
   const unique=[...new Set(colorNames)].slice(0,5);
-  const hexColors=pixels.slice(0,5).map(({r,g,b})=>'#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join(''));
-
   let styleObj=STYLE_RULES[STYLE_RULES.length-1];
   for(const r of STYLE_RULES)if(r.check(unique)){styleObj=r;break;}
 

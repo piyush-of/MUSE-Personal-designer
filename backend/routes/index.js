@@ -1,11 +1,14 @@
 'use strict';
 
 const multer = require('multer');
+const mongoose = require('mongoose');
 const config = require('../../config');
-const validate = require('../middleware/validate');
+const { validateAnalyze } = require('../middleware/validate');
 const { analyzeOutfit } = require('../controllers/analyzeController');
+const { checkAnalysisQuota } = require('../middleware/auth');
 const { UPDATED_AT, WOMEN_TRENDS, MEN_TRENDS } = require('../data/trends');
 const { SHOPPING_DB, SKIN_DATA, buildRetailerLinks } = require('../engine/fashionEngine');
+const { enhanceShoppingContextWithGemini, enhanceTrendsWithGemini } = require('../services/groqStylist');
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -232,11 +235,46 @@ function enrichShoppingItem(item, styleKey, skinTone, gender) {
 }
 
 const analyzeRouter = require('express').Router();
-analyzeRouter.post('/', upload.single('image'), validate, analyzeOutfit);
+analyzeRouter.post('/', upload.single('image'), validateAnalyze, checkAnalysisQuota, analyzeOutfit);
 
 const trendsRouter = require('express').Router();
 
-trendsRouter.get('/', (_req, res) => {
+trendsRouter.get('/', async (_req, res, next) => {
+  try {
+    const content = await enhanceTrendsWithGemini({ women: WOMEN_TRENDS, men: MEN_TRENDS });
+    res.json({
+      success: true,
+      data: {
+        updatedAt: UPDATED_AT,
+        women: WOMEN_TRENDS,
+        men: MEN_TRENDS,
+        content,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+trendsRouter.get('/women', async (_req, res, next) => {
+  try {
+    const content = await enhanceTrendsWithGemini({ women: WOMEN_TRENDS, men: [] });
+    res.json({ success: true, data: WOMEN_TRENDS, updatedAt: UPDATED_AT, content });
+  } catch (err) {
+    next(err);
+  }
+});
+
+trendsRouter.get('/men', async (_req, res, next) => {
+  try {
+    const content = await enhanceTrendsWithGemini({ women: [], men: MEN_TRENDS });
+    res.json({ success: true, data: MEN_TRENDS, updatedAt: UPDATED_AT, content });
+  } catch (err) {
+    next(err);
+  }
+});
+
+trendsRouter.get('/static', (_req, res) => {
   res.json({
     success: true,
     data: {
@@ -247,54 +285,66 @@ trendsRouter.get('/', (_req, res) => {
   });
 });
 
-trendsRouter.get('/women', (_req, res) => {
-  res.json({ success: true, data: WOMEN_TRENDS, updatedAt: UPDATED_AT });
-});
-
-trendsRouter.get('/men', (_req, res) => {
-  res.json({ success: true, data: MEN_TRENDS, updatedAt: UPDATED_AT });
-});
-
 const shoppingRouter = require('express').Router();
 
-shoppingRouter.get('/', (req, res) => {
+shoppingRouter.get('/', async (req, res, next) => {
   const { category, skinTone = 'medium', gender = 'women', itemType } = req.query;
-  const all = Object.entries(SHOPPING_DB).flatMap(([key, items]) =>
-    items.map(item => enrichShoppingItem(item, key, skinTone, gender))
-  );
+  try {
+    const all = Object.entries(SHOPPING_DB).flatMap(([key, items]) =>
+      items.map(item => enrichShoppingItem(item, key, skinTone, gender))
+    );
 
-  const filtered = all.filter(item => {
-    if (category && category !== 'all' && item.styleKey !== category) return false;
-    if (itemType && itemType !== 'all' && String(item.category || '').toLowerCase() !== String(itemType).toLowerCase()) return false;
-    return true;
-  });
+    const filtered = all.filter(item => {
+      if (category && category !== 'all' && item.styleKey !== category) return false;
+      if (itemType && itemType !== 'all' && String(item.category || '').toLowerCase() !== String(itemType).toLowerCase()) return false;
+      return true;
+    });
 
-  const trendPool = getTrendPool(gender).slice(0, 3).map(trend => ({
-    trend: trend.trend,
-    season: trend.season,
-    colors: trend.colors,
-  }));
+    const trendPool = getTrendPool(gender).slice(0, 3).map(trend => ({
+      trend: trend.trend,
+      season: trend.season,
+      colors: trend.colors,
+    }));
 
-  res.json({
-    success: true,
-    data: filtered,
-    categories: ['all', ...Object.keys(SHOPPING_DB)],
-    filters: {
-      genders: ['women', 'men'],
-      skinTones: Object.keys(SKIN_DATA),
-      itemTypes: ['all', 'Dress', 'Co-ord', 'Tops', 'Bottoms', 'Outerwear', 'Footwear', 'Accessories'],
-    },
-    context: {
+    const context = {
       updatedAt: UPDATED_AT,
       audience: resolveAudience(gender),
       skinTone,
       paletteHeadline: buildPalette(category && category !== 'all' ? category : 'neutral', skinTone),
       trendHighlights: trendPool,
-    },
-  });
+    };
+    const aiContent = await enhanceShoppingContextWithGemini(context, filtered);
+
+    res.json({
+      success: true,
+      data: filtered,
+      categories: ['all', ...Object.keys(SHOPPING_DB)],
+      filters: {
+        genders: ['women', 'men'],
+        skinTones: Object.keys(SKIN_DATA),
+        itemTypes: ['all', 'Dress', 'Co-ord', 'Tops', 'Bottoms', 'Outerwear', 'Footwear', 'Accessories'],
+      },
+      context: {
+        ...context,
+        aiContent,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 const healthRouter = require('express').Router();
-healthRouter.get('/', (_req, res) => res.json({ status: 'ok', service: 'muse-v3', timestamp: new Date().toISOString() }));
+healthRouter.get('/', (_req, res) => {
+  const dbState = ['disconnected', 'connected', 'connecting', 'disconnecting'][mongoose.connection.readyState] || 'unknown';
+  res.json({
+    status: dbState === 'connected' || config.isTest ? 'ok' : 'degraded',
+    service: 'muse-v4',
+    env: config.env,
+    database: dbState,
+    ai: config.gemini.enabled ? 'gemini' : 'fallback',
+    timestamp: new Date().toISOString(),
+  });
+});
 
 module.exports = { analyzeRouter, trendsRouter, shoppingRouter, healthRouter };

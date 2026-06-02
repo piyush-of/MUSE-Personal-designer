@@ -48,10 +48,11 @@
     <div class="trends-hero">
       <span class="section-label">03 - Latest Trend Radar</span>
       <h1>Latest fashion for <em>women</em> and <em>men</em></h1>
-      <p>See the current 2026 trend direction, the key pieces to copy, and quick recommendation links with visible prices so you can shop the look faster.</p>
+      <p id="trendSummary">See the current 2026 trend direction, the key pieces to copy, and quick recommendation links with visible prices so you can shop the look faster.</p>
       <div class="hero-meta">
         <span class="chip chip-gold" id="updatedAtChip">Updated 2026-03-17</span>
         <span class="chip">Spring / Summer 2026</span>
+        <span class="chip" id="aiChip">AI content fallback</span>
       </div>
     </div>
 
@@ -64,12 +65,14 @@
       <div id="tabWomen">
         <span class="section-label">Women - Latest 2026</span>
         <h2>Current <em>women's</em> fashion direction</h2>
+        <p class="trend-copy" id="womenIntro" style="max-width:720px;margin-top:.7rem"></p>
         <div class="trend-grid" id="womenGrid"></div>
       </div>
 
       <div id="tabMen" style="display:none">
         <span class="section-label">Men - Latest 2026</span>
         <h2>Current <em>men's</em> fashion direction</h2>
+        <p class="trend-copy" id="menIntro" style="max-width:720px;margin-top:.7rem"></p>
         <div class="trend-grid" id="menGrid"></div>
       </div>
     </div>
@@ -136,7 +139,12 @@
       const res=await fetch('./api/trends');
       const payload=await res.json();
       const data=payload.data||{};
+      const content=data.content||{};
       document.getElementById('updatedAtChip').textContent=`Updated ${data.updatedAt || '2026-03-17'}`;
+      if(content.summary) document.getElementById('trendSummary').textContent=content.summary;
+      if(content.womenIntro) document.getElementById('womenIntro').textContent=content.womenIntro;
+      if(content.menIntro) document.getElementById('menIntro').textContent=content.menIntro;
+      document.getElementById('aiChip').textContent=content.ai_provider==='gemini' ? `Gemini · ${content.ai_model || 'AI'}` : 'AI content fallback';
       document.getElementById('womenGrid').innerHTML=(data.women||[]).map(renderTrendCard).join('');
       document.getElementById('menGrid').innerHTML=(data.men||[]).map(renderTrendCard).join('');
     }catch(_err){

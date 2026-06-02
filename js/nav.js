@@ -15,6 +15,7 @@ const NAV_HTML = `
     <a href="${pageHref('analyze.html')}">Analyse</a>
     <a href="${pageHref('shopping.html')}">Shopping</a>
     <a href="${pageHref('trends.html')}">Trends</a>
+    <a href="${pageHref('wardrobe.html')}">Wardrobe</a>
     <a href="${pageHref('about.html')}">About</a>
   </div>
   <div class="nav-right">

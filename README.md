@@ -29,7 +29,42 @@ npm run dev
 open http://localhost:3000
 ```
 
-**No `.env` file needed. No API key. Nothing else required.**
+For local development, copy `.env.example` to `.env`. MongoDB and JWT secrets are required for auth, saved wardrobe history, and online deployment. Gemini and Resend keys are optional; the app falls back to local style intelligence and console email logs when they are not configured.
+
+---
+
+## Production Deployment
+
+The app is ready for Docker/Railway-style deployment as a single Express web service that serves the API and static pages.
+
+Required environment variables:
+
+```bash
+NODE_ENV=production
+PORT=3000
+MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/muse
+JWT_SECRET=<64-byte-random-secret>
+JWT_REFRESH_SECRET=<64-byte-random-secret>
+APP_URL=https://your-domain.com
+CORS_ORIGINS=https://your-domain.com
+```
+
+Optional integrations:
+
+```bash
+GEMINI_API_KEY=<gemini-api-key>
+GEMINI_MODEL=gemini-2.0-flash
+RESEND_API_KEY=<resend-api-key>
+EMAIL_FROM=noreply@your-domain.com
+```
+
+Deploy steps:
+
+1. Create a MongoDB Atlas database and copy its connection string into `MONGODB_URI`.
+2. Generate both JWT secrets with `node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"`.
+3. Deploy with the included `Dockerfile` or `railway.toml`.
+4. Set `APP_URL` and `CORS_ORIGINS` to the final HTTPS domain.
+5. Use `/health` as the uptime check endpoint.
 
 ---
 

@@ -1,69 +1,23 @@
 'use strict';
 
 const router = require('express').Router();
-const { registerUser, createSession, clearSession, SESSION_TTL_MS } = require('../utils/authStore');
+const cookieParser = require('cookie-parser');
+const {
+  register, login, refresh, logout, me, verifyEmail, forgotPassword, resetPassword,
+} = require('../controllers/authController');
+const { attachUser } = require('../middleware/auth');
+const { validate, registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } = require('../middleware/validate');
+const { authLoginLimiter, authRegisterLimiter } = require('../middleware/rateLimiter');
 
-function setSessionCookie(res, token) {
-  const isProd = process.env.NODE_ENV === 'production';
-  const cookieParts = [
-    `muse_session=${encodeURIComponent(token)}`,
-    'Path=/',
-    'HttpOnly',
-    'SameSite=Lax',
-    `Max-Age=${Math.floor(SESSION_TTL_MS / 1000)}`,
-  ];
-  if (isProd) cookieParts.push('Secure');
-  res.setHeader('Set-Cookie', cookieParts.join('; '));
-}
+router.use(cookieParser());
 
-function clearSessionCookie(res) {
-  res.setHeader('Set-Cookie', 'muse_session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0');
-}
+router.post('/register', authRegisterLimiter, validate(registerSchema), register);
+router.post('/login',    authLoginLimiter,    validate(loginSchema),    login);
+router.post('/refresh',  refresh);
+router.post('/logout',   logout);
+router.get('/me',        attachUser, me);
+router.get('/verify/:token', verifyEmail);
+router.post('/forgot-password', validate(forgotPasswordSchema), forgotPassword);
+router.post('/reset-password/:token', validate(resetPasswordSchema), resetPassword);
 
-router.post('/register', async (req, res, next) => {
-  try {
-    const { name = '', email = '', password = '' } = req.body || {};
-    if (!name.trim() || !email.trim() || !password.trim()) {
-      return res.status(400).json({ success: false, error: 'Name, email, and password are required.' });
-    }
-    if (password.trim().length < 8) {
-      return res.status(400).json({ success: false, error: 'Password must be at least 8 characters.' });
-    }
-    const user = await registerUser({ name, email, password });
-    const session = await createSession({ email, password });
-    setSessionCookie(res, session.token);
-    res.status(201).json({ success: true, user });
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.post('/login', async (req, res, next) => {
-  try {
-    const { email = '', password = '' } = req.body || {};
-    if (!email.trim() || !password.trim()) {
-      return res.status(400).json({ success: false, error: 'Email and password are required.' });
-    }
-    const session = await createSession({ email, password });
-    setSessionCookie(res, session.token);
-    res.json({ success: true, user: session.user });
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.post('/logout', async (req, res, next) => {
-  try {
-    if (req.authToken) await clearSession(req.authToken);
-    clearSessionCookie(res);
-    res.json({ success: true });
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.get('/me', (req, res) => {
-  res.json({ success: true, user: req.user || null });
-});
-
-module.exports = { authRouter: router };
+module.exports = router;

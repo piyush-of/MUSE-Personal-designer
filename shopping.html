@@ -20,6 +20,7 @@
     .context-pill { background: var(--bg-surface); border: 1px solid var(--border); padding: 0.8rem; }
     .context-pill strong { display: block; font-family: var(--f-display); font-size: 1rem; font-weight: 400; }
     .context-pill span { display: block; font-family: var(--f-mono); font-size: 0.55rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-top: 0.35rem; }
+    .ai-rule { margin-top: 0.85rem; border-top: 1px solid var(--border); padding-top: 0.85rem; color: var(--text-secondary); font-size: 0.82rem; line-height: 1.65; }
 
     .shop-toolbar { padding: 1.4rem 4rem; border-bottom: 1px solid var(--border); background: rgba(249,245,239,0.85); position: sticky; top: 64px; z-index: 100; backdrop-filter: blur(14px); }
     .toolbar-grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 0.8rem; }
@@ -91,6 +92,7 @@
         <span class="section-label">Live Context</span>
         <h3 id="contextHeadline">Medium skin tone + Classic Neutrals</h3>
         <p class="context-copy" id="contextCopy">Choose a category, audience, and skin tone to load stronger buying suggestions from the shopping and trend APIs together.</p>
+        <p class="ai-rule" id="buyingRule"></p>
         <div class="context-grid" id="contextGrid"></div>
       </aside>
     </section>
@@ -278,9 +280,11 @@
 
   function updateContext(context, count) {
     const palette = context.paletteHeadline || {};
+    const aiContent = context.aiContent || {};
     $('updatedChip').textContent = `Updated ${context.updatedAt || '2026-03-17'}`;
-    $('contextHeadline').textContent = palette.headline || 'Recommended shopping context';
-    $('contextCopy').textContent = `Showing ${count} picks for ${esc(context.audience || state.gender)} with a ${esc(state.skinTone)} skin tone. These suggestions blend shopping inventory with the latest trend signals.`;
+    $('contextHeadline').textContent = aiContent.headline || palette.headline || 'Recommended shopping context';
+    $('contextCopy').textContent = aiContent.copy || `Showing ${count} picks for ${esc(context.audience || state.gender)} with a ${esc(state.skinTone)} skin tone. These suggestions blend shopping inventory with the latest trend signals.`;
+    $('buyingRule').textContent = aiContent.buyingRule || '';
     $('contextGrid').innerHTML = `
       <div class="context-pill">
         <strong>${esc((palette.bestColors || [])[0] || 'Ivory')}</strong>
@@ -301,6 +305,9 @@
     $('accentColors').innerHTML = (palette.accents || []).map(renderTag).join('');
     $('avoidColors').innerHTML = (palette.avoid || []).map(renderTag).join('');
     $('trendList').innerHTML = (context.trendHighlights || []).map(renderTrend).join('');
+    if (aiContent.patternRule) {
+      $('trendList').insertAdjacentHTML('afterbegin', `<div class="trend-pill"><strong>Gemini styling rule</strong><span>${esc(aiContent.patternRule)}</span></div>`);
+    }
   }
 
   async function loadShoppingExperience() {
