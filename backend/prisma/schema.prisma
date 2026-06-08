@@ -1,0 +1,63 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                  String         @id @default(uuid())
+  name                String
+  email               String         @unique
+  password            String
+  role                String         @default("member")
+  plan                String         @default("free")
+  analysesUsed        Int            @default(0)
+  analysesLimit       Int            @default(10)
+  isVerified          Boolean        @default(false)
+  verifyToken         String?
+  verifyTokenExpiry   DateTime?
+  resetPasswordToken  String?
+  resetPasswordExpiry DateTime?
+  loginAttempts       Int            @default(0)
+  lockedUntil         DateTime?
+  lastLoginAt         DateTime?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  analyses            Analysis[]
+  refreshTokens       RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@map("refresh_tokens")
+}
+
+model Analysis {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skinTone       String
+  gender         String
+  score          Int?
+  styleCategory  String?
+  detectedColors String[]
+  aiProvider     String   @default("none")
+  result         Json
+  imageHash      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("analyses")
+}
