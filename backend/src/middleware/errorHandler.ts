@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import logger from '../utils/logger';
 import { Prisma } from '@prisma/client';
+import { captureException } from '../config/sentry';
 
 export function errorHandler(err: any, req: Request, res: Response, _next: NextFunction) {
   let status = err.status || err.statusCode || 500;
@@ -26,7 +27,8 @@ export function errorHandler(err: any, req: Request, res: Response, _next: NextF
   const isDev = process.env.NODE_ENV !== 'production';
 
   if (status >= 500) {
-    logger.error(`[${req.method}] ${req.path} →`, err.message, isDev ? err.stack : '');
+    logger.error({ method: req.method, path: req.path, err: err.message, stack: isDev ? err.stack : undefined }, 'Server error');
+    captureException(err);
   }
 
   res.status(status).json({

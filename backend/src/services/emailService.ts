@@ -81,7 +81,7 @@ export async function sendVerificationEmail(email: string, name: string, token: 
 }
 
 export async function sendPasswordResetEmail(email: string, name: string, token: string) {
-  const url = `${config.email.appUrl}/auth.html?reset=${token}`;
+  const url = `${config.email.appUrl}/auth?reset=${token}`;
   try {
     await transporter.sendMail({
       from: `MUSE Studio <${config.email.from}>`,

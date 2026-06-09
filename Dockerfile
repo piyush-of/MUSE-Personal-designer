@@ -1,23 +1,10 @@
-# Use official lightweight Node.js 20 image
+# Deprecated — use docker-compose or docker/Dockerfile.backend
+# This file is kept for backward compatibility with Railway.
 FROM node:20-alpine
-
-# Set the execution environment to production
-ENV NODE_ENV=production
-
-# Set the working directory inside the container
 WORKDIR /app
-
-# Copy only package files to leverage Docker caching for dependency layers
-COPY package*.json ./
-
-# Install only production dependencies
-RUN npm ci --only=production
-
-# Copy the rest of the application files
-COPY . .
-
-# Expose port 3000 to the host machine
-EXPOSE 3000
-
-# Run the node server
-CMD ["node", "backend/server.js"]
+COPY backend/package*.json ./
+RUN npm ci --omit=dev
+COPY backend/ ./
+RUN npx prisma generate && npm run build
+EXPOSE 3001
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]

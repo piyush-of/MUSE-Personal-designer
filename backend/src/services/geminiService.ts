@@ -1,66 +1,4 @@
-import { config } from '../config';
-import logger from '../utils/logger';
-
-function extractJsonObject(text = ''): any {
-  const start = text.indexOf('{');
-  const end = text.lastIndexOf('}');
-  if (start === -1 || end === -1 || end <= start) return null;
-  try {
-    return JSON.parse(text.slice(start, end + 1));
-  } catch {
-    return null;
-  }
-}
-
-function extractGeminiText(payload: any): string {
-  return (payload?.candidates || [])
-    .flatMap((candidate: any) => candidate?.content?.parts || [])
-    .map((part: any) => part.text || '')
-    .join('\n')
-    .trim();
-}
-
-async function generateGeminiJson(prompt: string, { task = 'content', temperature = 0.45 } = {}): Promise<any> {
-  if (!config.gemini.enabled) return null;
-
-  const endpoint = `${config.gemini.baseUrl}/models/${encodeURIComponent(config.gemini.model)}:generateContent?key=${encodeURIComponent(config.gemini.apiKey)}`;
-
-  try {
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        systemInstruction: {
-          parts: [{
-            text: 'You are MUSE, a precise luxury fashion intelligence engine. Return strict JSON only. Do not include markdown.',
-          }],
-        },
-        contents: [{
-          role: 'user',
-          parts: [{ text: prompt }],
-        }],
-        generationConfig: {
-          temperature,
-          responseMimeType: 'application/json',
-        },
-      }),
-      signal: AbortSignal.timeout(config.gemini.timeoutMs),
-    });
-
-    if (!response.ok) {
-      const body = await response.text();
-      logger.warn(`Gemini ${task} request failed with ${response.status}: ${body.slice(0, 240)}`);
-      return null;
-    }
-
-    const payload = await response.json();
-    const text = extractGeminiText(payload);
-    return extractJsonObject(text);
-  } catch (error: any) {
-    logger.warn(`Gemini ${task} skipped: ${error.message}`);
-    return null;
-  }
-}
+import { generateAIJson } from './aiService';
 
 function listJoin(items: string[] = []): string {
   const clean = items.filter(Boolean);
@@ -145,9 +83,11 @@ function buildAnalysisPrompt(analysis: any): string {
 
 export async function enhanceAnalysisWithGemini(analysis: any): Promise<any> {
   const fallbackAnalysis = buildFallbackEnhancement(analysis);
-  const parsed = await generateGeminiJson(buildAnalysisPrompt(fallbackAnalysis), {
+  const { data: parsed, provider, model } = await generateAIJson(buildAnalysisPrompt(fallbackAnalysis), {
     task: 'analysis',
     temperature: 0.45,
+    cacheKey: `analysis:${JSON.stringify(fallbackAnalysis.outfit_analysis?.detected_colors || [])}`,
+    cacheTtlSec: 1800,
   });
 
   if (!parsed) return fallbackAnalysis;
@@ -174,8 +114,8 @@ export async function enhanceAnalysisWithGemini(analysis: any): Promise<any> {
       dos: Array.isArray(parsed.dos) && parsed.dos.length ? parsed.dos : fallbackAnalysis.style_dos_donts.dos,
       donts: Array.isArray(parsed.donts) && parsed.donts.length ? parsed.donts : fallbackAnalysis.style_dos_donts.donts,
     },
-    ai_provider: 'gemini',
-    ai_model: config.gemini.model,
+    ai_provider: provider,
+    ai_model: model,
   };
 }
 
@@ -202,9 +142,11 @@ function buildTrendPrompt(women: any[], men: any[]): string {
 
 export async function enhanceTrendsWithGemini({ women, men }: { women: any[]; men: any[] }): Promise<any> {
   const fallback = fallbackTrendContent(women, men);
-  const parsed = await generateGeminiJson(buildTrendPrompt(women, men), {
+  const { data: parsed, provider, model } = await generateAIJson(buildTrendPrompt(women, men), {
     task: 'trends',
     temperature: 0.55,
+    cacheKey: 'trends:editorial',
+    cacheTtlSec: 3600,
   });
 
   if (!parsed) return { ...fallback, ai_provider: 'fallback', ai_model: 'muse-rule-polish-v1' };
@@ -213,9 +155,9 @@ export async function enhanceTrendsWithGemini({ women, men }: { women: any[]; me
     summary: parsed.summary || fallback.summary,
     womenIntro: parsed.womenIntro || fallback.womenIntro,
     menIntro: parsed.menIntro || fallback.menIntro,
-    keySignals: Array.isArray(parsed.keySignals) && parsed.keySignals.length ? parsed.keySignals.slice(0, 4) : fallback.keySignals,
-    ai_provider: 'gemini',
-    ai_model: config.gemini.model,
+    keySignals: Array.isArray(parsed.keySignals) && parsed.keySignals.length ? (parsed.keySignals as string[]).slice(0, 4) : fallback.keySignals,
+    ai_provider: provider,
+    ai_model: model,
   };
 }
 
@@ -248,9 +190,12 @@ function buildShoppingPrompt(context: any, items: any[]): string {
 
 export async function enhanceShoppingContextWithGemini(context: any, items: any[]): Promise<any> {
   const fallback = fallbackShoppingContent(context, items.length);
-  const parsed = await generateGeminiJson(buildShoppingPrompt(context, items), {
+  const cacheKey = `shopping:${context.audience}:${context.skinTone}:${items.length}`;
+  const { data: parsed, provider, model } = await generateAIJson(buildShoppingPrompt(context, items), {
     task: 'shopping content',
     temperature: 0.5,
+    cacheKey,
+    cacheTtlSec: 1800,
   });
 
   if (!parsed) return { ...fallback, ai_provider: 'fallback', ai_model: 'muse-rule-polish-v1' };
@@ -259,7 +204,7 @@ export async function enhanceShoppingContextWithGemini(context: any, items: any[
     copy: parsed.copy || fallback.copy,
     buyingRule: parsed.buyingRule || fallback.buyingRule,
     patternRule: parsed.patternRule || fallback.patternRule,
-    ai_provider: 'gemini',
-    ai_model: config.gemini.model,
+    ai_provider: provider,
+    ai_model: model,
   };
 }

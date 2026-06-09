@@ -63,7 +63,8 @@ export async function analyzeOutfit(req: Request, res: Response, next: NextFunct
         detectedColors,
         aiProvider,
         result: data,
-        imageHash
+        imageHash,
+        imageUrl,
       });
       savedRecordId = analysisRecord.id;
     }

@@ -28,6 +28,13 @@ model User {
   updatedAt           DateTime       @updatedAt
   analyses            Analysis[]
   refreshTokens       RefreshToken[]
+  subscriptions       Subscription[]
+  usageRecords        UsageRecord[]
+  auditLogs           AuditLog[]
+  notifications       Notification[]
+  favorites           Favorite[]
+  outfits             Outfit[]
+  styleProfile        StyleProfile?
 
   @@map("users")
 }
@@ -55,9 +62,147 @@ model Analysis {
   aiProvider     String   @default("none")
   result         Json
   imageHash      String?
+  imageUrl       String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   @@index([userId, createdAt(sort: Desc)])
   @@map("analyses")
+}
+
+model Plan {
+  id              String         @id @default(uuid())
+  slug            String         @unique
+  name            String
+  description     String?
+  priceMonthly    Int            @default(0)
+  priceYearly     Int            @default(0)
+  analysesLimit   Int            @default(10)
+  features        String[]
+  isActive        Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  subscriptions   Subscription[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id                   String    @id @default(uuid())
+  userId               String
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId               String
+  plan                 Plan      @relation(fields: [planId], references: [id])
+  status               String    @default("active")
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  payments             Payment[]
+
+  @@index([userId])
+  @@map("subscriptions")
+}
+
+model Payment {
+  id              String       @id @default(uuid())
+  subscriptionId  String
+  subscription    Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  amount          Int
+  currency        String       @default("inr")
+  status          String       @default("pending")
+  stripePaymentId String?
+  createdAt       DateTime     @default(now())
+
+  @@map("payments")
+}
+
+model UsageRecord {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("usage_records")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  resource  String?
+  resourceId String?
+  ip        String?
+  userAgent String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("audit_logs")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  body      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+  @@map("notifications")
+}
+
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemType  String
+  itemId    String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, itemType, itemId])
+  @@map("favorites")
+}
+
+model Outfit {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  imageUrl    String?
+  items       Json?
+  occasion    String?
+  season      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@map("outfits")
+}
+
+model StyleProfile {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skinTone     String?
+  gender       String?
+  bestColors   String[]
+  avoidColors  String[]
+  stylePrefs   Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("style_profiles")
 }

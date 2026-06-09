@@ -1,29 +1,36 @@
-type LogLevel = 'error' | 'warn' | 'info' | 'debug' | 'http';
+import pino from 'pino';
+import { config } from '../config';
 
-const COLORS: Record<LogLevel, string> = {
-  error: '\x1b[31m',
-  warn: '\x1b[33m',
-  info: '\x1b[36m',
-  debug: '\x1b[90m',
-  http: '\x1b[90m',
-};
-
-const RESET = '\x1b[0m';
-
-function log(level: LogLevel, ...args: unknown[]) {
-  const method = level === 'error' ? 'error' : 'log';
-  console[method](
-    `${COLORS[level] || ''}[${new Date().toISOString()}][${level.toUpperCase()}]${RESET}`,
-    ...args
-  );
-}
+const pinoLogger = pino({
+  level: config.isTest ? 'silent' : config.isDev ? 'debug' : 'info',
+  transport: config.isDev && !config.isTest
+    ? { target: 'pino-pretty', options: { colorize: true, translateTime: 'SYS:standard' } }
+    : undefined,
+});
 
 export const logger = {
-  error: (...args: unknown[]) => log('error', ...args),
-  warn: (...args: unknown[]) => log('warn', ...args),
-  info: (...args: unknown[]) => log('info', ...args),
-  debug: (...args: unknown[]) => log('debug', ...args),
-  http: (...args: unknown[]) => log('http', ...args),
+  error: (objOrMsg: unknown, msg?: string) => {
+    if (typeof objOrMsg === 'string') pinoLogger.error(objOrMsg);
+    else if (msg) pinoLogger.error(objOrMsg as object, msg);
+    else pinoLogger.error(objOrMsg as object);
+  },
+  warn: (objOrMsg: unknown, msg?: string) => {
+    if (typeof objOrMsg === 'string') pinoLogger.warn(objOrMsg);
+    else if (msg) pinoLogger.warn(objOrMsg as object, msg);
+    else pinoLogger.warn(objOrMsg as object);
+  },
+  info: (objOrMsg: unknown, msg?: string) => {
+    if (typeof objOrMsg === 'string') pinoLogger.info(objOrMsg);
+    else if (msg) pinoLogger.info(objOrMsg as object, msg);
+    else pinoLogger.info(objOrMsg as object);
+  },
+  debug: (objOrMsg: unknown, msg?: string) => {
+    if (typeof objOrMsg === 'string') pinoLogger.debug(objOrMsg);
+    else if (msg) pinoLogger.debug(objOrMsg as object, msg);
+    else pinoLogger.debug(objOrMsg as object);
+  },
+  http: (msg: string) => pinoLogger.info({ type: 'http' }, msg),
+  child: (bindings: Record<string, unknown>) => pinoLogger.child(bindings),
 };
 
 export default logger;

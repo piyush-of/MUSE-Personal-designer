@@ -11,7 +11,7 @@ import {
   setRefreshCookie,
   clearRefreshCookie,
 } from '../utils/jwt';
-import { sendVerificationEmail, sendPasswordResetEmail } from '../services/emailService';
+import { enqueueEmail } from '../jobs/queue';
 import logger from '../utils/logger';
 import bcrypt from 'bcryptjs';
 
@@ -74,7 +74,7 @@ export async function register(req: Request, res: Response, next: NextFunction) 
       verifyTokenExpiry,
     });
 
-    await sendVerificationEmail(updatedUser.email, updatedUser.name, verifyToken);
+    await enqueueEmail({ type: 'verification', email: updatedUser.email, name: updatedUser.name, token: verifyToken });
     const accessToken = await issueTokens(updatedUser, res);
 
     logger.info(`[AUTH] New user registered: ${updatedUser.email}`);
@@ -136,7 +136,8 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
     const decoded = verifyRefreshToken(token);
     if (!decoded) return res.status(401).json({ success: false, error: 'Invalid or expired refresh token.' });
 
-    const tokenRecord = await refreshTokenRepository.find(hashToken(token));
+    const hashed = hashToken(token);
+    const tokenRecord = await refreshTokenRepository.find(hashed);
     if (!tokenRecord || tokenRecord.expiresAt < new Date()) {
       return res.status(401).json({ success: false, error: 'Refresh token invalid or expired.' });
     }
@@ -144,6 +145,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
     const user = await userRepository.findById(decoded.id);
     if (!user) return res.status(401).json({ success: false, error: 'User not found.' });
 
+    await refreshTokenRepository.delete(hashed);
     const accessToken = await issueTokens(user, res);
     res.json({ success: true, accessToken, user: toProfile(user) });
   } catch (err) {
@@ -209,7 +211,7 @@ export async function forgotPassword(req: Request, res: Response, next: NextFunc
       resetPasswordExpiry,
     });
 
-    await sendPasswordResetEmail(user.email, user.name, resetToken);
+    await enqueueEmail({ type: 'password-reset', email: user.email, name: user.name, token: resetToken });
     res.json({ success: true, message: 'If that email exists, a reset link has been sent.' });
   } catch (err) {
     next(err);

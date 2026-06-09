@@ -1,171 +1,121 @@
-# MUSE Fashion AI v3 — Multi-Page Platform
+# MUSE — AI-Powered Personal Fashion Intelligence
 
-> A complete full-stack fashion intelligence platform. Five pages, light/dark mode, celebrity trends, curated shopping with Amazon & Flipkart links, and a pixel-level outfit analyser.
+MUSE is a production-grade SaaS platform that analyses outfits, recommends colour palettes, curates shopping picks, and tracks fashion trends — all personalised to your skin tone.
 
----
+## Architecture
 
-## Pages
+```
+Frontend (Vercel) → Backend (Railway) → Redis → PostgreSQL (Neon)
+                              ↓
+                    Cloudinary · Gemini/OpenAI/Anthropic
+```
 
-| Page | Route | Description |
-|------|-------|-------------|
-| **Home** | `/` | Landing page with hero, features, how-it-works |
-| **Analyse** | `/analyze.html` | Upload outfit → full style report |
-| **Shopping** | `/shopping.html` | Curated picks with Amazon & Flipkart links |
-| **Trends** | `/trends.html` | Celebrity & global fashion trends |
-| **About** | `/about.html` | Project info, tech stack, philosophy |
+```
+MUSE/
+├── frontend/     React + Vite + TypeScript + TailwindCSS
+├── backend/      Express + TypeScript + Prisma + PostgreSQL + Redis + BullMQ
+├── docker/       Dockerfiles and nginx config
+├── docs/         Architecture, API, deployment, roadmap
+├── scripts/      Setup automation
+└── tests/        Cross-cutting integration tests
+```
 
----
+**v2.1** — Legacy static files removed. Single source of truth in `frontend/` and `backend/`.
 
 ## Quick Start
 
-```bash
-# 1. Install dependencies
-npm install
+### Prerequisites
+- Node.js 18+
+- PostgreSQL 16+ (or Docker)
 
-# 2. Start development server
-npm run dev
-
-# 3. Open browser
-open http://localhost:3000
-```
-
-For local development, copy `.env.example` to `.env`. MongoDB and JWT secrets are required for auth, saved wardrobe history, and online deployment. Gemini and Resend keys are optional; the app falls back to local style intelligence and console email logs when they are not configured.
-
----
-
-## Production Deployment
-
-The app is ready for Docker/Railway-style deployment as a single Express web service that serves the API and static pages.
-
-Required environment variables:
+### Setup
 
 ```bash
-NODE_ENV=production
-PORT=3000
-MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/muse
-JWT_SECRET=<64-byte-random-secret>
-JWT_REFRESH_SECRET=<64-byte-random-secret>
-APP_URL=https://your-domain.com
-CORS_ORIGINS=https://your-domain.com
+# Windows
+.\scripts\setup.ps1
+
+# macOS/Linux
+chmod +x scripts/setup.sh && ./scripts/setup.sh
 ```
 
-Optional integrations:
+### Development
 
 ```bash
-GEMINI_API_KEY=<gemini-api-key>
-GEMINI_MODEL=gemini-2.0-flash
-RESEND_API_KEY=<resend-api-key>
-EMAIL_FROM=noreply@your-domain.com
+npm run dev          # Start backend (3001) + frontend (5173)
+npm run dev:backend  # Backend only
+npm run dev:frontend # Frontend only
 ```
 
-Deploy steps:
+### Environment
 
-1. Create a MongoDB Atlas database and copy its connection string into `MONGODB_URI`.
-2. Generate both JWT secrets with `node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"`.
-3. Deploy with the included `Dockerfile` or `railway.toml`.
-4. Set `APP_URL` and `CORS_ORIGINS` to the final HTTPS domain.
-5. Use `/health` as the uptime check endpoint.
+Copy and configure:
+- `backend/.env.example` → `backend/.env`
+- `frontend/.env.example` → `frontend/.env`
 
----
+### Database
 
-## Project Structure
-
-```
-muse-v3/
-├── backend/
-│   ├── server.js                    ← Entry point + graceful shutdown
-│   ├── app.js                       ← Express + all middleware
-│   ├── engine/
-│   │   └── fashionEngine.js         ★ Complete rule-based fashion AI
-│   ├── data/
-│   │   └── trends.js                ← Celebrity & global trend data
-│   ├── controllers/
-│   │   └── analyzeController.js
-│   ├── routes/
-│   │   └── index.js                 ← /api/analyze + /api/trends + /api/shopping
-│   └── middleware/
-│       ├── validate.js
-│       └── errorHandler.js
-│
-├── frontend/public/
-│   ├── index.html                   ← Home page
-│   ├── analyze.html                 ← Outfit analyser
-│   ├── shopping.html                ← Curated shopping
-│   ├── trends.html                  ← Celebrity trends
-│   ├── about.html                   ← Project about page
-│   ├── css/
-│   │   └── style.css                ← Complete design system (light + dark mode)
-│   └── js/
-│       ├── nav.js                   ← Shared navigation injector
-│       └── shared.js                ← Theme toggle, active nav, toast
-│
-└── config/index.js
+```bash
+npm run prisma:migrate   # Run migrations
+npm run prisma:seed      # Seed demo users
 ```
 
----
+**Demo accounts:**
+- `demo@muse.style` / `Demo1234!`
+- `admin@muse.style` / `Admin123!`
 
-## API Endpoints
+### Docker
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/analyze` | Analyse outfit image for skin tone |
-| `GET`  | `/api/trends` | All celebrity + global trends |
-| `GET`  | `/api/trends/celebrity` | Bollywood celebrity trends only |
-| `GET`  | `/api/trends/global` | Global fashion trends only |
-| `GET`  | `/api/shopping?category=earthy` | Shopping picks (filter by category) |
-| `GET`  | `/health` | Server health check |
+```bash
+docker compose up --build
+```
 
----
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:3001
+- PostgreSQL: localhost:5432
 
-## Design System
+## Features
 
-### Light Mode (default)
-- Background: `#F9F5EF` (warm ivory)
-- Surface: `#FFFFFF`
-- Accent: `#B5674D` (rose terracotta)
-- Gold: `#A8864A`
-
-### Dark Mode
-- Background: `#0F0D0B` (deep charcoal)
-- Surface: `#1A1714`
-- Accent: `#D4856A` (warm rose)
-- Gold: `#C4A060`
-
-Toggle with the `☾ / ☀` button in the top navigation. Persists via `localStorage`.
-
-### Typography
-- **Display**: Playfair Display (editorial headings)
-- **Body**: Jost (formal, readable body text)
-- **Data**: DM Mono (labels, tags, metadata)
-
----
-
-## Fashion Engine
-
-All intelligence lives in `backend/engine/fashionEngine.js`:
-
-| Component | Description |
-|-----------|-------------|
-| `SKIN_DATA` | 6 skin tone profiles with best/avoid colours, hex palettes, metals, neutrals |
-| `COLOR_CATEGORIES` | 22 RGB test functions mapping pixels to fashion colour names |
-| `STYLE_RULES` | Pattern rules detecting 7 style categories |
-| `GOOD_PAIRS` | 13 harmonious colour combinations (+18 pts each) |
-| `BAD_PAIRS` | 5 clashing colour combinations (−15 pts each) |
-| `SHOPPING_DB` | 5 categories × 4 items = 20 curated shopping picks with Amazon/Flipkart links |
-| `COMBO_DB` | 4 occasion types × 3 combos = 12 curated outfit formulas |
-| `DOS_DONTS` | Per-skin-tone style rules (4 dos + 3 don'ts each) |
-
----
+- **Outfit Analysis** — Upload photos, get AI-enhanced style scores
+- **11 Skin Tone Profiles** — Personalised colour palettes
+- **Curated Shopping** — Filter by category, gender, skin tone
+- **Trend Radar** — Spring/Summer 2026 trends
+- **Wardrobe** — Save and manage analysis history
+- **Cart/Wishlist** — Client-side with target price alerts
+- **Auth** — JWT access + refresh tokens, RBAC, email verification
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Runtime | Node.js 18+ |
-| Server | Express 4 |
-| Image Processing | Jimp (pure JS, no native deps) |
-| Upload | Multer (memory storage) |
-| Security | Helmet + CORS + express-rate-limit |
-| Frontend | Vanilla HTML / CSS / JS |
-| Fonts | Playfair Display + Jost + DM Mono |
-| Theme | CSS Custom Properties (light + dark) |
+| Frontend | React 19, Vite, TypeScript, TailwindCSS, React Query, React Hook Form, Zod |
+| Backend | Node.js, Express, TypeScript, Prisma ORM |
+| Database | PostgreSQL (Neon recommended) |
+| Images | Cloudinary |
+| AI | Google Gemini |
+| Auth | JWT + bcrypt + httpOnly cookies |
+| Testing | Vitest + RTL (frontend), Jest + Supertest (backend) |
+| CI/CD | GitHub Actions |
+| Deploy | Vercel (frontend), Railway (backend), Neon (DB) |
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start full stack in development |
+| `npm run build` | Build frontend + backend |
+| `npm test` | Run all tests |
+| `npm run lint` | TypeScript + ESLint checks |
+
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [API Reference](docs/API.md)
+- [Deployment](docs/DEPLOYMENT.md)
+- [Security](docs/SECURITY.md)
+- [Contributing](docs/CONTRIBUTING.md)
+- [Changelog](docs/CHANGELOG.md)
+- [Migration Report](docs/MIGRATION_REPORT.md)
+
+## License
+
+Proprietary — MUSE Studio © 2026

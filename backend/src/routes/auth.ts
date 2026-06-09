@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import cookieParser from 'cookie-parser';
 import {
   register,
   login,
@@ -16,8 +15,6 @@ import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema 
 import { authLoginLimiter, authRegisterLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
-
-router.use(cookieParser());
 
 router.post('/register', authRegisterLimiter, validate(registerSchema), register);
 router.post('/login', authLoginLimiter, validate(loginSchema), login);

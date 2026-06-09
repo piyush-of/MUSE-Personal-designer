@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { Response } from 'express';
 import { config } from '../config';
 
@@ -8,20 +8,18 @@ export interface TokenPayload {
   role: string;
 }
 
+const signOptions = (expiresIn: string): SignOptions => ({
+  expiresIn: expiresIn as SignOptions['expiresIn'],
+  issuer: 'muse.style',
+  audience: 'muse-client',
+});
+
 export function signAccessToken(payload: TokenPayload): string {
-  return jwt.sign(payload, config.jwt.secret, {
-    expiresIn: config.jwt.accessExpiry,
-    issuer: 'muse.style',
-    audience: 'muse-client',
-  });
+  return jwt.sign(payload, config.jwt.secret, signOptions(config.jwt.accessExpiry));
 }
 
 export function signRefreshToken(payload: TokenPayload): string {
-  return jwt.sign(payload, config.jwt.refreshSecret, {
-    expiresIn: config.jwt.refreshExpiry,
-    issuer: 'muse.style',
-    audience: 'muse-client',
-  });
+  return jwt.sign(payload, config.jwt.refreshSecret, signOptions(config.jwt.refreshExpiry));
 }
 
 export function verifyAccessToken(token: string): TokenPayload | null {
